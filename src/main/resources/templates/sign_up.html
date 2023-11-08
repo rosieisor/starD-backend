@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/login.css">
+<link rel="stylesheet" href="../css/sign.css">
+
+</html>
+<body>
+<header>
+    <nav class="gnb">
+        <ul>
+            <li>
+            <a href="#">로그인</a>
+            </li>
+            <li>
+            <a href="/signup">회원가입</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+</body>
+<div class="container">
+    <div class="wrap">
+    <div class="logo">
+        <h1><a  href="/">STAR D</a></h1>
+    </div>
+    <div class="input_logo">
+    <h1>회원가입</h1>
+    </div>
+    
+    <div class="input_info">
+        <form method="post" th:action="@{/signup}">
+        <ul>
+           <li><span id="id">아이디<input type="text" name="id" placeholder="아이디를 입력해주세요.">
+            <button id ="ok">중복확인</button></span></li>
+        
+           <li><span id="pw">패스워드</span><input type="text" name="password" placeholder="패스워드를 입력해주세요."></li>
+         
+           <li><span id="nic">닉네임</span><input type="text" name="nickname" placeholder="닉네임을 입력해주세요."></li>
+       
+           <li><span id="name">이름</span><input type="text" name="name" placeholder="이름을 입력해주세요."></li>
+        
+           <li><span id="phone">전화번호</span><input type="text" name="phone" placeholder="전화번호를 입력해주세요."></li>
+        
+           <li ><span id="mail">이메일</span><input type="text" name="email" placeholder="이메일를 입력해주세요."></li>
+        </ul>
+        <div class="submit_btn">
+        <input type="submit" value="회원가입"/>    
+        </div>
+        </form>
+    </div>
+    <div class="subgnb">
+      <nav >
+           <ul>
+             <li><a href="#">아이디 찾기</a></li>
+              <li><a href="#">비밀번호 찾기</a></li>
+              <li><a href="./sign_up.html">회원가입</a></li>
+        </ul>
+    </nav>
+</div>
+</div>
+</div>
