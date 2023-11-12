@@ -23,4 +23,6 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
 
     List<Applicant> findByStudyAndParticipationState(Study study, boolean participationState);
 
+
+    List<Applicant> findByMemberAndStudyProgressStatusIsNotNull(Member member);
 }

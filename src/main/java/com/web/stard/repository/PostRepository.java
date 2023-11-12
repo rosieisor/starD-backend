@@ -20,4 +20,34 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdAndType(Long id, PostType type);
 
     List<Post> findAllByMember(Member member);
+
+
+    /* 제목 검색 (최근 순) */
+    List<Post> findByTypeAndTitleContainingOrderByCreatedAtDesc(PostType type, String searchWord);
+    /* 내용 검색 (최근 순) */
+    List<Post> findByTypeAndContentContainingOrderByCreatedAtDesc(PostType type, String searchWord);
+    /* 작성자 검색 (최근 순) */
+    List<Post> findByTypeAndMemberOrderByCreatedAtDesc(PostType type, Member member);
+
+    /* 카테고리 - 제목 검색 (최근 순) */
+    List<Post> findByTypeAndCategoryAndTitleContainingOrderByCreatedAtDesc(PostType type, String category, String searchWord);
+    /* 카테고리 - 내용 검색 (최근 순) */
+    List<Post> findByTypeAndCategoryAndContentContainingOrderByCreatedAtDesc(PostType type, String category, String searchWord);
+    /* 카테고리 - 작성자 검색 (최근 순) */
+    List<Post> findByTypeAndCategoryAndMemberOrderByCreatedAtDesc(PostType type, String category, Member member);
+
+
+    /* 제목 검색 (최근 순 + 페이징) */
+    List<Post> findByTypeAndTitleContaining(PostType type, String searchWord, Pageable pageable);
+    /* 내용 검색 (최근 순 + 페이징) */
+    List<Post> findByTypeAndContentContaining(PostType type, String searchWord, Pageable pageable);
+    /* 작성자 검색 (최근 순 + 페이징) */
+    List<Post> findByTypeAndMember(PostType type, Member member, Pageable pageable);
+
+    /* 카테고리 - 제목 검색 (최근 순 + 페이징) */
+    List<Post> findByTypeAndCategoryAndTitleContaining(PostType type, String category, String searchWord, Pageable pageable);
+    /* 카테고리 - 내용 검색 (최근 순 + 페이징) */
+    List<Post> findByTypeAndCategoryAndContentContaining(PostType type, String category, String searchWord, Pageable pageable);
+    /* 카테고리 - 작성자 검색 (최근 순 + 페이징) */
+    List<Post> findByTypeAndCategoryAndMember(PostType type, String category, Member member, Pageable pageable);
 }

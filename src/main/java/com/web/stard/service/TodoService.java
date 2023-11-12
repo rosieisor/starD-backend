@@ -4,6 +4,7 @@ import com.web.stard.domain.Assignee;
 import com.web.stard.domain.Member;
 import com.web.stard.domain.Study;
 import com.web.stard.domain.ToDo;
+import com.web.stard.dto.ToDoDto;
 import com.web.stard.repository.AssigneeRepository;
 import com.web.stard.repository.TodoRepository;
 import lombok.AllArgsConstructor;
@@ -79,7 +80,7 @@ public class TodoService {
     }
 
     /* 스터디 내 모든 TO DO 조회 */
-    public List<ToDo> getAllToDoListByStudy(Long studyId, int year, int month) {
+    public List<ToDoDto> getAllToDoListByStudy(Long studyId, int year, int month) {
         Study study = studyService.findById(studyId);
 
         LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0, 0);
@@ -87,13 +88,23 @@ public class TodoService {
                 23, 59, 59);
 
         List<ToDo> toDoList = todoRepository.findAllByStudyAndDueDateBetween(study, start, end);
+        List<ToDoDto> toDoDtoList = null;
 
         for (ToDo t : toDoList) {
+            if (toDoDtoList == null) {
+                toDoDtoList = new ArrayList<>();
+            }
+
+            ToDoDto toDoDto = new ToDoDto(
+                    t.getId(), t.getStudy(), t.getTask(), t.getDueDate()
+            );
             List<Assignee> assignees = getAssignee(t.getId());
-            t.setAssignees(assignees);
+            toDoDto.setAssignees(assignees);
+
+            toDoDtoList.add(toDoDto);
         }
 
-        return toDoList;
+        return toDoDtoList;
     }
 
 
@@ -101,7 +112,7 @@ public class TodoService {
 
     /* TO DO 등록 */
     @Transactional
-    public ToDo registerTodo(Long studyId, ToDo toDo, String assigneeStr) {
+    public ToDoDto registerTodo(Long studyId, ToDo toDo, String assigneeStr) {
         Study study = studyService.findById(studyId);
         toDo.setStudy(study);
 
@@ -123,14 +134,18 @@ public class TodoService {
 
         assigneeRepository.saveAll(assignees);
 
-        toDo.setAssignees(assignees);
+        ToDoDto toDoDto = new ToDoDto(
+                toDo.getId(), toDo.getStudy(), toDo.getTask(), toDo.getDueDate()
+        );
 
-        return toDo;
+        toDoDto.setAssignees(assignees);
+
+        return toDoDto;
     }
 
     /* TO DO 수정 */
     @Transactional
-    public ToDo updateTodo(Long toDoId, ToDo updateToDo, String assigneeStr) {
+    public ToDoDto updateTodo(Long toDoId, ToDo updateToDo, String assigneeStr) {
         ToDo toDo = getToDo(toDoId);
         List<Assignee> initialAssignee = getAssignee(toDoId); // 기존 담당자
 
@@ -163,20 +178,21 @@ public class TodoService {
         // 리스트에 남아 있는 담당자들은 삭제 (수정된 담당자에서 제외된 경우)
         assigneeRepository.deleteAll(initialAssignee);
 
+        ToDoDto toDoDto = new ToDoDto(
+                toDo.getId(), toDo.getStudy(), toDo.getTask(), toDo.getDueDate()
+        );
 
         List<Assignee> assignees = getAssignee(toDo.getId());
-        toDo.setAssignees(assignees);
+        toDoDto.setAssignees(assignees);
 
-        return toDo;
+        return toDoDto;
     }
 
     /* TO DO 삭제 */
     @Transactional
     public boolean deleteTodo(Long toDoId) {
         ToDo toDo = getToDo(toDoId);
-        List<Assignee> assignee = getAssignee(toDoId);
 
-        assigneeRepository.deleteAll(assignee); // 담당자 삭제
         todoRepository.delete(toDo); // TO DO 삭제
 
         if (getToDo(toDoId) == null) { // 삭제됨

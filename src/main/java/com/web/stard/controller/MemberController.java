@@ -1,22 +1,16 @@
 package com.web.stard.controller;
 
 import com.web.stard.domain.Member;
-import com.web.stard.domain.Profile;
 import com.web.stard.service.MemberService;
-import com.web.stard.service.ProfileService;
 import com.web.stard.service.SignUpService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
 
 @RestController
@@ -60,6 +54,14 @@ public class MemberController {
     @GetMapping("/member/find-nickname")
     private Member findNicknameById(Authentication authentication) {
         return memberService.findNickNameByAuthentication(authentication);
+    }
+
+    // Authentication으로 권한 찾기
+    @GetMapping("/member/auth")
+    private Collection<? extends GrantedAuthority> findAuth(Authentication authentication) {
+        String userId = authentication.getName();
+        Member member = memberService.find(userId);
+        return member.getAuthorities();
     }
 
     // 거주지, 관심분야 저장

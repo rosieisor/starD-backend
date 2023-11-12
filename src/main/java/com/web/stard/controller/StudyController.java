@@ -4,6 +4,7 @@ import com.web.stard.domain.Applicant;
 import com.web.stard.domain.RecruitStatus;
 import com.web.stard.domain.Study;
 import com.web.stard.dto.StudyDto;
+import com.web.stard.dto.response.Top5Dto;
 import com.web.stard.service.StudyService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,7 +52,7 @@ public class StudyController {
 
     @GetMapping("/search-by-recruiter")     // [R] 키워드(작성자)로 스터디 게시글 검색
     public Page<Study> getStudiesByRecruiter(@RequestParam("keyword") String keyword, @RequestParam(value = "page", defaultValue = "1", required = false) int page) {
-        return studyService.findByRecruiterContainingOrderByRecruitStatus(keyword, page);
+        return studyService.findByRecruiter_NicknameContainingOrderByRecruitStatus(keyword, page);
     }
 
     // [R] 모집 중인 게시글 중에서 키워드 검색
@@ -110,19 +111,19 @@ public class StudyController {
 
     @PostMapping       // [C] 스터디 게시글 생성
     public Study createStudy(@RequestBody StudyDto studyDto) {
-        System.out.println(studyDto);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return studyService.createStudy(studyDto, authentication);
     }
 
 
     @DeleteMapping("/{id}")      // [D] 스터디 게시글 삭제
-    public void deleteStudy(@PathVariable long id, Authentication authentication){
-        studyService.deleteStudy(id, authentication);
+    public boolean deleteStudy(@PathVariable long id, Authentication authentication){
+        return studyService.deleteStudy(id, authentication);
     }
 
     @PutMapping("/{id}")     // [U] 스터디 게시글 수정
     public Study updateStudy(@PathVariable long id, @RequestBody StudyDto studyDto, Authentication authentication){
+        System.out.println("진입" +  studyDto);
         return studyService.updateStudy(id, studyDto, authentication);
     }
 
@@ -200,6 +201,20 @@ public class StudyController {
             return ResponseEntity.badRequest().body(result);
         }
     }
+
+    @GetMapping("/study-ranking")       // [R] 스터디 참여자 리스트 Select
+    public ResponseEntity<Map<String, Object>> findStudyRanking() {
+        Map<String, Object> result = new HashMap<>();
+        try{
+            result.put("data", studyService.findStudyRanking());
+            return ResponseEntity.ok().body(result);
+        }catch (Exception e) {
+            System.out.println(e);
+            result.put("data", "스터디 분야 Top 5 가져오기 실패");
+            return ResponseEntity.badRequest().body(result);
+        }
+    }
+
 
 
 }

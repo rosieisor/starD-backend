@@ -143,11 +143,12 @@ public class ReplyService {
         return replyRepository.findAllByStudyIdOrderByCreatedAtAsc(studyId);
     }
 
-    // 댓글 작성하려는 게시글 타입 조회
+    // 해당 id로 타입 조회 (댓글 작성 및 신고할 때 사용) - COMM, QNA, NOTICE, FAQ, STUDY, REPLY
     public PostType findPostTypeById(Long id) {
         // Post 조회
         Optional<Post> postOptional = postRepository.findById(id);
         // 해당 id가 post, study에 모두 존재하는 경우 구별하기 위해 고유한 필드값(notnull) 확인
+        //TODO - id랑 작성자로 조회해야 할 것 같은데
         if (postOptional.isPresent() && postOptional.get().getCategory() != null) {
             return postOptional.get().getType();
         }
@@ -158,7 +159,13 @@ public class ReplyService {
             return studyOptional.get().getType();
         }
 
-        return null;
+        // Reply 조회
+/*        Optional<Reply> replyOptional = replyRepository.findById(id);
+        if (replyOptional.isPresent() && replyOptional.get().getContent() != null) {
+            return replyOptional.get().getType();
+        }*/
+
+        return PostType.REPLY;
     }
 
 }

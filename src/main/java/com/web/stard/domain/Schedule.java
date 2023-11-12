@@ -25,4 +25,6 @@ public class Schedule {
     @Column(name = "start_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime startDate; // 날짜, 시간
+
+    private String color; // 달력 표시 색상
 }

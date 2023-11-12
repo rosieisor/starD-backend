@@ -29,10 +29,12 @@ public class ReplyController {
     // Post(Community, Qna) 댓글 생성
     @PostMapping("/post")
     public Reply createPostReply(@RequestBody Map<String, Object> requestPayload, Authentication authentication) {
-        Integer targetId = (Integer) requestPayload.get("targetId");
+        String targetIdStr = (String) requestPayload.get("targetId");
+        Integer targetId = Integer.parseInt(targetIdStr);
+
         String replyContent = (String) requestPayload.get("replyContent");
 
-        Long targetIdLong = targetId != null ? targetId.longValue() : null;
+        Long targetIdLong = targetId.longValue();
 
         return replyService.createPostReply(targetIdLong, replyContent, authentication);
     }
@@ -41,10 +43,13 @@ public class ReplyController {
     @PostMapping("/study")
     public Reply createStudyReply(@RequestBody Map<String, Object> requestPayload, Authentication authentication) {
         // Request Body에서 필요한 데이터 추출
-        Integer targetId = (Integer) requestPayload.get("targetId"); // Integer로 변경
+        //Integer targetId = (Integer) requestPayload.get("targetId"); // Integer로 변경
+        String targetIdStr = (String) requestPayload.get("targetId");
+        Integer targetId = Integer.parseInt(targetIdStr);
+
         String replyContent = (String) requestPayload.get("replyContent");
 
-        Long targetIdLong = targetId != null ? targetId.longValue() : null; // Integer를 Long으로 변환
+        Long targetIdLong = targetId.longValue(); // Integer를 Long으로 변환
 
         return replyService.createStudyReply(targetIdLong, replyContent, authentication);
     }

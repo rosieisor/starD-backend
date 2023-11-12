@@ -74,10 +74,11 @@ public class ScheduleService {
         return schedule;
     }
 
-    /* 일정 수정 (title만 변경) */
-    public Schedule updateSchedule(Long scheduleId, String title) {
+    /* 일정 수정 (title, color만 변경) */
+    public Schedule updateSchedule(Long scheduleId, String title, String color) {
         Schedule schedule = getSchedule(scheduleId);
         schedule.setTitle(title);
+        schedule.setColor(color);
 
         scheduleRepository.save(schedule);
 

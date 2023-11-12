@@ -2,6 +2,7 @@ package com.web.stard.controller;
 
 import com.web.stard.domain.Assignee;
 import com.web.stard.domain.ToDo;
+import com.web.stard.dto.ToDoDto;
 import com.web.stard.service.MemberService;
 import com.web.stard.service.StudyService;
 import com.web.stard.service.TodoService;
@@ -39,14 +40,14 @@ public class ToDoController {
 
     /* 스터디 내 모든 TO DO 조회 */
     @GetMapping("/{studyId}")
-    public List<ToDo> getAllToDoListByStudy(@PathVariable Long studyId, @RequestParam int year, @RequestParam int month) {
+    public List<ToDoDto> getAllToDoListByStudy(@PathVariable Long studyId, @RequestParam int year, @RequestParam int month) {
         return todoService.getAllToDoListByStudy(studyId, year, month);
     }
 
 
     /* TO DO 등록 */
     @PostMapping
-    public ToDo registerTodo(@RequestParam Long studyId, @RequestBody ToDo toDo,
+    public ToDoDto registerTodo(@RequestParam Long studyId, @RequestBody ToDo toDo,
                              @RequestParam String assigneeStr, Authentication authentication) {
         // TODO : 권한 확인 (스터디원인지) -> 동작 확인 필요
         if (!studyService.checkStudyMember(studyId, authentication.getName())) {
@@ -57,8 +58,8 @@ public class ToDoController {
     }
 
     /* TO DO 수정 */
-    @PostMapping("/{toDoId}")
-    public ToDo updateTodo(@PathVariable Long toDoId, @RequestBody ToDo updateToDo,
+    @PutMapping ("/{toDoId}")
+    public ToDoDto updateTodo(@PathVariable Long toDoId, @RequestBody ToDo updateToDo,
                            @RequestParam String assigneeStr, Authentication authentication) {
         // TODO : 권한 확인 (스터디원인지) -> 동작 확인 필요
         if (!todoService.checkStudyMemberByToDo(toDoId, authentication.getName())) {

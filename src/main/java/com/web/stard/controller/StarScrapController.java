@@ -1,7 +1,11 @@
 package com.web.stard.controller;
 
+import com.web.stard.domain.Member;
+import com.web.stard.domain.Post;
 import com.web.stard.domain.StarScrap;
 import com.web.stard.domain.Study;
+import com.web.stard.service.CommunityService;
+import com.web.stard.service.MemberService;
 import com.web.stard.service.StarScrapService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +22,8 @@ import java.util.List;
 public class StarScrapController {
 
     private final StarScrapService starScrapService;
+    private final MemberService memberService;
+    private final CommunityService communityService;
 
 
 
@@ -25,6 +31,18 @@ public class StarScrapController {
     @PostMapping("/star/post/{id}")
     public StarScrap addPostStar(@PathVariable Long id, Authentication authentication) {
         return starScrapService.addPostStar(id, authentication);
+    }
+
+    /* Post(community) 공감 여부 확인 */
+    @GetMapping("/star/post/{id}")
+    public Boolean getPostStar(@PathVariable Long id, Authentication authentication) {
+        Member member = memberService.find(authentication.getName());
+        Post post = communityService.getCommunityPost(id, null);
+        StarScrap starScrap = starScrapService.existsCommStar(member, post);
+        if (starScrap == null) {
+            return false;
+        }
+        return true;
     }
 
     /* Post(Community) 공감 삭제 */
@@ -57,8 +75,20 @@ public class StarScrapController {
 
     /* Post(community) 스크랩한 게시글 전체 조회 */
     @GetMapping("/scrap/post")
-    public List<Study> allPostScrapList(Authentication authentication) {
+    public List<Post> allPostScrapList(Authentication authentication) {
         return starScrapService.allPostScrapList(authentication);
+    }
+
+    /* Post(community) 스크랩 여부 확인 */
+    @GetMapping("/scrap/post/{id}")
+    public Boolean getPostScrap(@PathVariable Long id, Authentication authentication) {
+        Member member = memberService.find(authentication.getName());
+        Post post = communityService.getCommunityPost(id, null);
+        StarScrap starScrap = starScrapService.existsCommScrap(member, post);
+        if (starScrap == null) {
+            return false;
+        }
+        return true;
     }
 
     /* Post(community) 스크랩 추가 */
@@ -128,4 +158,30 @@ public class StarScrapController {
                                                   @RequestParam String status, @RequestParam String type) {
         return starScrapService.getMyPageStudyStarScrap(page, authentication, status, type);
     }
+
+    /* 스터디 검색 결과 (제목) - 공감, 스크랩 조회 */
+    @GetMapping("/study/search/title/star-scrap")
+    public List<Boolean> getStudySearchTitleStarScraps(@RequestParam(value = "page", defaultValue = "1", required = false) int page,
+                                                  Authentication authentication,
+                                                  @RequestParam String keyword, @RequestParam String type) {
+        return starScrapService.getStudySearchStarScraps(page, authentication, "title", keyword, type);
+    }
+
+    /* 스터디 검색 결과 (내용) - 공감, 스크랩 조회 */
+    @GetMapping("/study/search/content/star-scrap")
+    public List<Boolean> getStudySearchContentStarScraps(@RequestParam(value = "page", defaultValue = "1", required = false) int page,
+                                                  Authentication authentication,
+                                                  @RequestParam String keyword, @RequestParam String type) {
+        return starScrapService.getStudySearchStarScraps(page, authentication, "content", keyword, type);
+    }
+
+    /* 스터디 검색 결과 (작성자) - 공감, 스크랩 조회 */
+    @GetMapping("/study/search/recruiter/star-scrap")
+    public List<Boolean> getStudySearchRecruiterStarScraps(@RequestParam(value = "page", defaultValue = "1", required = false) int page,
+                                                         Authentication authentication,
+                                                         @RequestParam String keyword, @RequestParam String type) {
+        return starScrapService.getStudySearchStarScraps(page, authentication, "recruiter", keyword, type);
+    }
+
+
 }

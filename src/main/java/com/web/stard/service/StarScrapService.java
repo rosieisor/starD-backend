@@ -41,7 +41,7 @@ public class StarScrapService {
 
     /* 해당 Post(community)의 공감 개수 */
     public int countPostStar(Long id) {
-        Post post = communityService.getCommunityPost(id);
+        Post post = communityService.getCommunityPost(id, null);
 
         List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(post, ActType.STAR, PostType.COMM);
 
@@ -51,7 +51,7 @@ public class StarScrapService {
 
     /* Post(community) 공감 추가 */
     public StarScrap addPostStar(Long id, Authentication authentication) {
-        Post post = communityService.getCommunityPost(id);
+        Post post = communityService.getCommunityPost(id, null);
         Member member = memberService.find(authentication.getName());
 
         // 자신의 글은 공감 불가능
@@ -79,7 +79,7 @@ public class StarScrapService {
 
     /* Post(community) 공감 삭제 */
     public boolean deletePostStar(Long id, Authentication authentication) {
-        Post post = communityService.getCommunityPost(id);
+        Post post = communityService.getCommunityPost(id, null);
         Member member = memberService.find(authentication.getName());
         StarScrap star = existsCommStar(member, post);
 
@@ -193,22 +193,22 @@ public class StarScrapService {
     }
 
     /* 스크랩한 Post(community) List 조회 */
-    public List<Study> allPostScrapList(Authentication authentication) {
+    public List<Post> allPostScrapList(Authentication authentication) {
         Member member = memberService.find(authentication.getName());
         List<StarScrap> scraps = starScrapRepository.findAllByMemberAndTypeAndTableType(member, ActType.SCRAP, PostType.COMM);
-        List<Study> scrapList = null;
+        List<Post> postList = null;
         if (scraps.size() > 0) {
-            scrapList = new ArrayList<>();
+            postList = new ArrayList<>();
         }
         for (StarScrap s : scraps) {
-            scrapList.add(s.getStudy());
+            postList.add(s.getPost());
         }
-        return scrapList;
+        return postList;
     }
 
     /* 해당 Post(community)의 스크랩 개수 */
     public int countPostScrap(Long id) {
-        Post post = communityService.getCommunityPost(id);
+        Post post = communityService.getCommunityPost(id, null);
 
         List<StarScrap> allScrapList = starScrapRepository.findAllByPostAndTypeAndTableType(post, ActType.SCRAP, PostType.COMM);
 
@@ -217,7 +217,7 @@ public class StarScrapService {
 
     /* Post(community) Scrap 추가 */
     public StarScrap addPostScrap(Long id, Authentication authentication) {
-        Post post = communityService.getCommunityPost(id);
+        Post post = communityService.getCommunityPost(id, null);
         Member member = memberService.find(authentication.getName());
 
         // 이미 존재하는지 확인 (혹시 모를 중복 저장 방지)
@@ -240,7 +240,7 @@ public class StarScrapService {
 
     /* Post(community) Scrap 삭제 */
     public boolean deletePostScrap(Long id, Authentication authentication) {
-        Post post = communityService.getCommunityPost(id);
+        Post post = communityService.getCommunityPost(id, null);
         Member member = memberService.find(authentication.getName());
         StarScrap scrap = existsCommScrap(member, post);
 
@@ -465,6 +465,52 @@ public class StarScrapService {
                     } else {
                         starScraps.add(true);
                     }
+                }
+            }
+        }
+
+        return starScraps;
+    }
+
+    public List<Boolean> getStudySearchStarScraps(int page, Authentication authentication,
+                                                  String status, String keyword, String type) {
+        // status = 제목, 내용, 작성자
+        // type = star, scrap
+
+        Page<Study> studies = null;
+        List<Boolean> starScraps = null;
+        Member member = memberService.find(authentication.getName());
+
+        if (status.equals("title")) {
+            studies = studyService.findByTitleContainingOrderByRecruitStatus(keyword, page);
+        } else if (status.equals("content")) {
+            studies = studyService.findByContentContainingOrderByRecruitStatus(keyword, page);
+        } else {
+            studies = studyService.findByRecruiter_NicknameContainingOrderByRecruitStatus(keyword, page);
+        }
+
+        if (type.equals("star")) { // star
+            for (Study study : studies.getContent()) {
+                if (starScraps == null) {
+                    starScraps = new ArrayList<>();
+                }
+
+                if (existsStudyStar(member, study) == null) {
+                    starScraps.add(false);
+                } else {
+                    starScraps.add(true);
+                }
+            }
+        } else { // scrap
+            for (Study study : studies.getContent()) {
+                if (starScraps == null) {
+                    starScraps = new ArrayList<>();
+                }
+
+                if (existsStudyScrap(member, study) == null) {
+                    starScraps.add(false);
+                } else {
+                    starScraps.add(true);
                 }
             }
         }

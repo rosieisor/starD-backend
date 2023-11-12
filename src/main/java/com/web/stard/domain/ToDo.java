@@ -29,11 +29,6 @@ public class ToDo {
     private LocalDateTime dueDate; // TO DO 날짜
 
 
-
-    @Transient // DB랑 매핑되지 않음
-    @JsonIgnore
-    private List<Assignee> assignees; // 담당자
-
     @Override
     public String toString() {
         String str = "ToDo{" +
@@ -42,9 +37,6 @@ public class ToDo {
                 ", task='" + task + '\'' +
                 ", dueDate=" + dueDate +
                 '}' + "\n" + "assignee : ";
-        for (Assignee a : assignees) {
-            str += a.getMember().getId() + " + " + a.isToDoStatus() + ", ";
-        }
 
         return str;
     }

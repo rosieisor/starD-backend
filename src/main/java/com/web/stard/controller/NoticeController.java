@@ -24,7 +24,7 @@ public class NoticeController {
     private  final NoticeService noticeService;
 
     // Notice 등록
-    @PostMapping("/admin")
+    @PostMapping
     public Post createNotice(@RequestBody Post post, Authentication authentication) {
         noticeService.createNotice(post, authentication);
         return post;
@@ -32,9 +32,16 @@ public class NoticeController {
 
     // Notice 리스트 조회
     @GetMapping
+    public List<Post> getAllNotice() {
+        return noticeService.getAllNotice();
+    }
+
+    // 페이지화
+/*
     public List<Post> getAllNotice(@RequestParam("page") int page) {
         return noticeService.getAllNotice(page);
     }
+*/
 
 
     // Notice 상세 조회
@@ -44,15 +51,15 @@ public class NoticeController {
     }
 
     // Notice 수정
-    @PostMapping("admin/{id}")
+    @PostMapping("/{id}")
     public Post updateNotice(@PathVariable Long id, @RequestBody Post requestPost, Authentication authentication) {
         Post post = noticeService.updateNotice(id, requestPost, authentication);
         return post;
     }
 
     // Notice 삭제
-    @DeleteMapping("admin/{postId}")
-    public void deleteNotice(@PathVariable Long postId, Authentication authentication) {
-        noticeService.deleteNotice(postId, authentication);
+    @DeleteMapping("/{id}")
+    public void deleteNotice(@PathVariable Long id, Authentication authentication) {
+        noticeService.deleteNotice(id, authentication);
     }
 }

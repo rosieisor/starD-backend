@@ -115,10 +115,9 @@ public class ReportService {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 study 게시글을 찾을 수 없습니다."));
 
-        // TODO - 스터디에 게시글 작성자를 저장할 수 있어야 구현 가능
-/*        if (study.getMember() == currentUser) {
+        if (study.getRecruiter() == currentUser) {
             throw new IllegalArgumentException("내가 작성한 글은 신고할 수 없습니다.");
-        }*/
+        }
 
         // 모집 중인 스터디만 신고 가능
         if (study.getRecruitStatus() != RecruitStatus.RECRUITING) {

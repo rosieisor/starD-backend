@@ -19,4 +19,9 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
     Page<StudyMember> findByMember(Member member, Pageable pageable);
 
     List<StudyMember> findByStudy(Study study);
+
+    /* 특정 회원의 진행 중인 스터디가 있는지 */
+    List<StudyMember> findByMemberAndStudyProgressStatusIn(Member member, List<ProgressStatus> progressStatusList);
+    /* 진행 완료된 스터디로 검색 */
+    List<StudyMember> findByMemberAndStudyProgressStatus(Member member, ProgressStatus progressStatus);
 }

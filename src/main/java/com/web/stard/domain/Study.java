@@ -1,5 +1,6 @@
 package com.web.stard.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -57,7 +58,8 @@ public class Study extends BaseEntity {
 
     @CreatedDate
     @Column(name = "recruitment_start", updatable = false)
-    private LocalDateTime recruitmentStart;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate recruitmentStart;
 
     @NotNull @Column(name = "recruitment_deadline")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

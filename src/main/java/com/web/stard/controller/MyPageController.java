@@ -2,6 +2,7 @@ package com.web.stard.controller;
 
 import com.web.stard.domain.*;
 import com.web.stard.dto.ProfileDto;
+import com.web.stard.service.EvaluationService;
 import com.web.stard.service.MemberService;
 import com.web.stard.service.ProfileService;
 import com.web.stard.service.StudyService;
@@ -34,6 +35,8 @@ public class MyPageController {
 
     private final ProfileService profileService;
     private final StudyService studyService;
+
+    private final EvaluationService evaluationService;
 
     /* 정보 반환 */
     @GetMapping("/update")
@@ -204,16 +207,8 @@ public class MyPageController {
 
     /* 회원 탈퇴 (아직 기능 X) */
     @PostMapping("/delete")
-    public boolean delete(@RequestParam("password") String password) {
-        // 현재 로그인한 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String id = authentication.getName(); // 사용자 아이디
-            if (!id.equals("anonymousUser")) {
-                return memberService.deleteMember(id, password);
-            }
-        }
-        return false;
+    public ResponseEntity<String> delete(@RequestParam("password") String password, Authentication authentication) {
+        return memberService.deleteMember(authentication.getName(), password);
     }
 
     // [U] 프로필 수정
@@ -261,4 +256,21 @@ public class MyPageController {
     }
 
 
+    /* 평가 당한 내역 리스트 전체 조회 (전체 스터디) */
+    @GetMapping("/rate/target")
+    public List<Evaluation> getMyEvaluationList(Authentication authentication) {
+        return evaluationService.getMyEvaluationList(authentication);
+    }
+
+    /* 평가 당한 내역 리스트 조회 (스터디 별로) */
+    @GetMapping("/rate/target/{studyId}")
+    public List<Evaluation> getMyEvaluationListByStudy(@PathVariable Long studyId, Authentication authentication) {
+        return evaluationService.getMyEvaluationListByStudy(studyId, authentication);
+    }
+
+    /* 평가 당한 내역 상세 조회 */
+    @GetMapping("/rate/target/{evaluationId}")
+    public Evaluation getMyEvaluation(@PathVariable Long evaluationId, Authentication authentication) {
+        return evaluationService.getMyEvaluation(evaluationId, authentication);
+    }
 }

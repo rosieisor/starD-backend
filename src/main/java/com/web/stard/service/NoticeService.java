@@ -1,10 +1,8 @@
 package com.web.stard.service;
 
-import com.web.stard.domain.Member;
-import com.web.stard.domain.Post;
-import com.web.stard.domain.PostType;
-import com.web.stard.domain.Role;
+import com.web.stard.domain.*;
 import com.web.stard.repository.PostRepository;
+import com.web.stard.repository.StarScrapRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +26,7 @@ public class NoticeService {
 
     MemberService memberService;
     PostRepository postRepository;
+    StarScrapRepository starScrapRepository;
 
     // Notice 등록
     public Post createNotice(Post post, Authentication authentication) {
@@ -40,14 +39,39 @@ public class NoticeService {
         return postRepository.save(post);
     }
 
-    // Notice 리스트 조회 (회원, 비회원도 리스트 조회 가능)
+    // Notice 리스트 조회 (페이지화x)
+    public List<Post> getAllNotice() {
+        List<Post> posts = postRepository.findByTypeOrderByCreatedAtDesc(PostType.NOTICE);
+
+        for (Post p : posts) { // 스크랩 수, 공감 수
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.NOTICE);
+            List<StarScrap> allScrapList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.SCRAP, PostType.NOTICE);
+
+            p.setStarCount(allStarList.size());
+            p.setScrapCount(allScrapList.size());
+        }
+
+        return posts;
+    }
+
     public List<Post> getAllNotice(int page) {
 
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page-1, 10, sort);
         // page -> 배열 인덱스처럼 들어가서 -1 해야 함
         // 한 페이지에 Post 10개 (개수는 추후 수정)
-        return postRepository.findByType(PostType.NOTICE, pageable);
+
+        List<Post> posts = postRepository.findByType(PostType.NOTICE, pageable);
+
+        for (Post p : posts) { // 스크랩 수, 공감 수
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.NOTICE);
+            List<StarScrap> allScrapList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.SCRAP, PostType.NOTICE);
+
+            p.setStarCount(allStarList.size());
+            p.setScrapCount(allScrapList.size());
+        }
+
+        return posts;
     }
 
     // Notice 상세 조회 (회원도 상세 조회 가능)
@@ -74,15 +98,15 @@ public class NoticeService {
     }
 
     // Notice 삭제
-    public void deleteNotice(Long postId, Authentication authentication) {
+    public void deleteNotice(Long id, Authentication authentication) {
         String userId = authentication.getName();
         Role userRole = memberService.find(userId).getRoles();
 
-        Optional<Post> optionalPost = postRepository.findById(postId);
+        Optional<Post> optionalPost = postRepository.findById(id);
 
         optionalPost.ifPresent(post -> {
             if (userRole == Role.ADMIN ) {   // 관리자일때만
-                postRepository.deleteById(postId);
+                postRepository.deleteById(id);
             }
         });
     }
