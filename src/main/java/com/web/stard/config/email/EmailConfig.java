@@ -30,17 +30,17 @@ public class EmailConfig {
     @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
     private boolean starttlsEnable;
 
-//    @Value("${spring.mail.properties.mail.smtp.starttls.required}")
-//    private boolean starttlsRequired;
+    @Value("${spring.mail.properties.mail.smtp.starttls.required}")
+    private boolean starttlsRequired;
 
-    @Value("${spring.mail.properties.mail.smtp.connectiontimeout}")
-    private int connectionTimeout;
+//    @Value("${spring.mail.properties.mail.smtp.connectiontimeout}")
+//    private int connectionTimeout;
 
-    @Value("${spring.mail.properties.mail.smtp.timeout}")
-    private int timeout;
+//    @Value("${spring.mail.properties.mail.smtp.timeout}")
+//    private int timeout;
 
-    @Value("${spring.mail.properties.mail.smtp.writetimeout}")
-    private int writeTimeout;
+//    @Value("${spring.mail.properties.mail.smtp.writetimeout}")
+//    private int writeTimeout;
 
     @Bean
     public JavaMailSender javaMailSender() {
@@ -60,10 +60,15 @@ public class EmailConfig {
 
         properties.put("mail.smtp.auth", auth);
         properties.put("mail.smtp.starttls.enable", starttlsEnable);
-//        properties.put("mail.smtp.starttls.required", starttlsRequired);
-        properties.put("mail.smtp.connectiontimeout", connectionTimeout);
-        properties.put("mail.smtp.timeout", timeout);
-        properties.put("mail.smtp.writetimeout", writeTimeout);
+        properties.put("mail.smtp.starttls.required", starttlsRequired);
+//        properties.put("mail.smtp.connectiontimeout", connectionTimeout);
+//        properties.put("mail.smtp.timeout", timeout);
+//        properties.put("mail.smtp.writetimeout", writeTimeout);
+
+        properties.setProperty("mail.transport.protocol", "smtp"); // 프로토콜 설정
+        properties.setProperty("mail.debug", "true"); // 디버그 사용
+        properties.setProperty("mail.smtp.ssl.trust","smtp.naver.com"); // ssl 인증 서버는 smtp.naver.com
+        properties.setProperty("mail.smtp.ssl.enable","true"); // ssl 사용
 
         return properties;
     }

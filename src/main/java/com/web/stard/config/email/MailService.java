@@ -32,6 +32,9 @@ public class MailService{
     @Value("${spring.mail.auth-code-expiration-millis}")
     private long authCodeExpirationMillis;
 
+    @Value("${spring.mail.username}")
+    private String adminAccount;
+
     /*
     sendEmail( ): 이메일을 발송하는 메서드 파라미터
      */
@@ -61,6 +64,8 @@ public class MailService{
         text += authCode;
         message.setText(text);
 
+        String sender = adminAccount + "@naver.com";
+        message.setFrom(new InternetAddress(sender));
         //보내는 사람의 메일 주소, 보내는 사람 이름
 //        message.setFrom(new InternetAddress(id,"prac_Admin"));
 
@@ -84,9 +89,7 @@ public class MailService{
     이후 인증 코드를 검증하기 위해 생성한 인증 코드를 Redis에 저장한다.
      */
     public void sendCodeToEmail(String toEmail) throws Exception {
-        System.out.printf("sendCodeToEmail 진입 toEmail: "+ toEmail);
         String authCode = this.createAuthCode();
-        System.out.printf("sendCodeToEmail 진입 authCode: "+ authCode);
         sendEmail(toEmail, authCode);
 
         // 이메일 인증 요청 시 인증 번호 Redis에 저장 ( key = "AuthCode " + Email / value = AuthCode )
@@ -100,17 +103,22 @@ public class MailService{
     만약 두 코드가 동일하다면 true를, Redis에서 Code가 없거나 일치하지 않는다면 false를 반화한다.
      */
 
-    public boolean verifiedCode(String email, String authCode) {
+    public boolean verifiedCode(String email, String authCode) throws Exception{
         String redisAuthCode = (String) redisTemplate.opsForValue().get(AUTH_CODE_PREFIX + email);
 
-        boolean authResult;
+        if (redisAuthCode == null)
+            throw new Exception("시간 초과");
+
+        boolean authResult = false;
 
         if (redisAuthCode.equals(authCode))
             authResult = true;
-        else
-            authResult = false;
 
         return authResult;
     }
+
+
+
+
 
 }
