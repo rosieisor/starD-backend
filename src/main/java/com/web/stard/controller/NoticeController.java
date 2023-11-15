@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -48,7 +49,14 @@ public class NoticeController {
     // Notice 상세 조회
     @GetMapping("/{id}")
     public Post getNoticeDetail(@PathVariable Long id) {
-        return noticeService.getNoticeDetail(id);
+        String userId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            if (!id.equals("anonymousUser")) {
+                userId = authentication.getName(); // 사용자 아이디
+            }
+        }
+        return noticeService.getNoticeDetail(id, userId);
     }
 
     // Notice 수정

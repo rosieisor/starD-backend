@@ -47,10 +47,8 @@ public class NoticeService {
 
         for (Post p : posts) { // 스크랩 수, 공감 수
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.NOTICE);
-            List<StarScrap> allScrapList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.SCRAP, PostType.NOTICE);
 
             p.setStarCount(allStarList.size());
-            p.setScrapCount(allScrapList.size());
         }
 
         return posts;
@@ -77,10 +75,24 @@ public class NoticeService {
     }
 
     // Notice 상세 조회 (회원도 상세 조회 가능)
-    public Post getNoticeDetail(Long id) {
+    public Post getNoticeDetail(Long id, String userId) {
         Optional<Post> result = postRepository.findByIdAndType(id, PostType.NOTICE);
         if (result.isPresent()) {
-            return result.get();
+            Post post = result.get();
+
+            if (userId != null) {
+                if (!post.getMember().getId().equals(userId)) {
+                    // 작성자 != 현재 로그인 한 유저
+                    post.setViewCount(post.getViewCount()+1);
+                    postRepository.save(post);
+                }
+            }
+
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(post, ActType.STAR, PostType.NOTICE);
+
+            post.setStarCount(allStarList.size());
+
+            return post;
         }
         return null;
     }
@@ -88,7 +100,7 @@ public class NoticeService {
     // Notice 수정
     public Post updateNotice(Long id, Post requestPost, Authentication authentication) {
         Member member = memberService.find(authentication.getName());
-        Post post = getNoticeDetail(id);
+        Post post = getNoticeDetail(id, member.getAuthorities().toString());
 
         post.setTitle(requestPost.getTitle());
         post.setContent(requestPost.getContent());

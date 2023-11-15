@@ -1,10 +1,8 @@
 package com.web.stard.service;
 
-import com.web.stard.domain.Member;
-import com.web.stard.domain.Post;
-import com.web.stard.domain.PostType;
-import com.web.stard.domain.Role;
+import com.web.stard.domain.*;
 import com.web.stard.repository.PostRepository;
+import com.web.stard.repository.StarScrapRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +25,7 @@ public class FaqService {
 
     MemberService memberService;
     PostRepository postRepository;
+    StarScrapRepository starScrapRepository;
 
     // faq 등록
     public Post createFaq(Post post, Authentication authentication) {
@@ -50,10 +49,24 @@ public class FaqService {
     }
 
     // faq 상세 조회
-    public Post getFaqDetail(Long id) {
+    public Post getFaqDetail(Long id, String userId) {
         Optional<Post> result = postRepository.findByIdAndType(id, PostType.FAQ);
         if (result.isPresent()) {
-            return result.get();
+            Post post = result.get();
+
+            if (userId != null) {
+                if (!post.getMember().getId().equals(userId)) {
+                    // 작성자 != 현재 로그인 한 유저
+                    post.setViewCount(post.getViewCount()+1);
+                    postRepository.save(post);
+                }
+            }
+
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(post, ActType.STAR, PostType.FAQ);
+
+            post.setStarCount(allStarList.size());
+
+            return post;
         }
         return null;
     }
@@ -61,7 +74,7 @@ public class FaqService {
     // faq 수정
     public Post updateFaq(Long id, Post requestPost, Authentication authentication) {
         Member member = memberService.find(authentication.getName());
-        Post post = getFaqDetail(id);
+        Post post = getFaqDetail(id, member.getAuthorities().toString());
 
         post.setTitle(requestPost.getTitle());
         post.setContent(requestPost.getContent());

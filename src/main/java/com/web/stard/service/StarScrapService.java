@@ -197,11 +197,11 @@ public class StarScrapService {
         PostType postType = null;
 
         if (type.equals("NOTICE")) {
-            post = noticeService.getNoticeDetail(id);
+            post = noticeService.getNoticeDetail(id, null);
             postType = PostType.NOTICE;
         }
         else if (type.equals("FAQ")) {
-            post = faqService.getFaqDetail(id);
+            post = faqService.getFaqDetail(id, null);
             postType = PostType.FAQ;
         }
 
@@ -236,11 +236,11 @@ public class StarScrapService {
         PostType postType = null;
 
         if (type.equals("NOTICE")) {
-            post = noticeService.getNoticeDetail(id);
+            post = noticeService.getNoticeDetail(id, null);
             postType = PostType.NOTICE;
         }
         else if (type.equals("FAQ")) {
-            post = faqService.getFaqDetail(id);
+            post = faqService.getFaqDetail(id, null);
             postType = PostType.FAQ;
         }
 
