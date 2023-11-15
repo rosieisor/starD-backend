@@ -7,10 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Getter
@@ -47,7 +49,14 @@ public class NoticeController {
     // Notice 상세 조회
     @GetMapping("/{id}")
     public Post getNoticeDetail(@PathVariable Long id) {
-        return noticeService.getNoticeDetail(id);
+        String userId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            if (!id.equals("anonymousUser")) {
+                userId = authentication.getName(); // 사용자 아이디
+            }
+        }
+        return noticeService.getNoticeDetail(id, userId);
     }
 
     // Notice 수정
@@ -62,4 +71,17 @@ public class NoticeController {
     public void deleteNotice(@PathVariable Long id, Authentication authentication) {
         noticeService.deleteNotice(id, authentication);
     }
+
+    // id로 타입 조회
+    @GetMapping("/find-type/{id}")
+    public Optional<Post> findTypeById(@PathVariable Long id, Authentication authentication) {
+        return noticeService.findTypeById(id, authentication);
+    }
+
+    // notice, faq 최신 순 전체 보기
+    @GetMapping("/all")
+    public List<Post> findAllNoticeAndFaq() {
+        return noticeService.getAllNoticesAndFaqs();
+    }
+
 }

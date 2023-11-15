@@ -1,12 +1,7 @@
 package com.web.stard.controller;
 
-import com.web.stard.domain.Member;
-import com.web.stard.domain.Post;
-import com.web.stard.domain.StarScrap;
-import com.web.stard.domain.Study;
-import com.web.stard.service.CommunityService;
-import com.web.stard.service.MemberService;
-import com.web.stard.service.StarScrapService;
+import com.web.stard.domain.*;
+import com.web.stard.service.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +19,8 @@ public class StarScrapController {
     private final StarScrapService starScrapService;
     private final MemberService memberService;
     private final CommunityService communityService;
-
+    private final NoticeService noticeService;
+    private final FaqService faqService;
 
 
     /* Post(community) 공감 추가 */
@@ -70,6 +66,42 @@ public class StarScrapController {
         return starScrapService.deleteStudyStar(id, authentication);
     }
 
+    // Notice, FAQ
+    /* Post(notice,faq) 공감 추가 */
+    @PostMapping("/star/notice/{id}")
+    public StarScrap addNoticeStar(@PathVariable Long id, @RequestParam String type, Authentication authentication) {
+        return starScrapService.addNoticeStar(id, type, authentication);
+    }
+
+    /* Post(notice,faq) 공감 여부 확인 */
+    @GetMapping("/star/notice/{id}")
+    public Boolean getNoticeStar(@PathVariable Long id, @RequestParam String type, Authentication authentication) {
+        Member member = memberService.find(authentication.getName());
+        Post post = null;
+        PostType postType = null;
+
+        if (type.equals("NOTICE")) {
+            post = noticeService.getNoticeDetail(id, null);
+            postType = PostType.NOTICE;
+        }
+        else if (type.equals("FAQ")) {
+            post = faqService.getFaqDetail(id, null);
+            postType = PostType.FAQ;
+        }
+
+        StarScrap starScrap = starScrapService.existsNoticeStar(member, post, postType);
+
+        if (starScrap == null) {
+            return false;
+        }
+        return true;
+    }
+
+    /* Post(notice,faq) 공감 삭제 */
+    @DeleteMapping("/star/notice/{id}")
+    public boolean deleteNoticeStar(@PathVariable Long id, @RequestParam String type, Authentication authentication) {
+        return starScrapService.deleteNoticeStar(id, type, authentication);
+    }
 
 
 

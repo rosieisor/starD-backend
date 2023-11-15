@@ -22,7 +22,8 @@ public class StarScrapService {
     CommunityService communityService;
     StudyService studyService;
     StarScrapRepository starScrapRepository;
-
+    NoticeService noticeService;
+    FaqService faqService;
 
     /* Post(community) Star 여부 확인 */
     public StarScrap existsCommStar(Member member, Post post) {
@@ -178,6 +179,86 @@ public class StarScrapService {
         } return false;
     }
 
+
+
+    // Notice, FAQ
+    /* Post(notice,faq) Star 여부 확인 */
+    public StarScrap existsNoticeStar(Member member, Post post, PostType postType) {
+        Optional<StarScrap> star = starScrapRepository.findByMemberAndPostAndTypeAndTableType(member, post, ActType.STAR, postType);
+
+        if (star.isPresent()) {
+            return star.get();
+        } return null;
+    }
+
+    /* Post(notice,faq) 공감 추가 */
+    public StarScrap addNoticeStar(Long id, String type, Authentication authentication) {
+        Post post = null;
+        PostType postType = null;
+
+        if (type.equals("NOTICE")) {
+            post = noticeService.getNoticeDetail(id, null);
+            postType = PostType.NOTICE;
+        }
+        else if (type.equals("FAQ")) {
+            post = faqService.getFaqDetail(id, null);
+            postType = PostType.FAQ;
+        }
+
+        Member member = memberService.find(authentication.getName());
+
+        // 관리자는 공감 불가능
+        if (post.getMember().getAuthorities().equals("ROLE_ADMIN")) {
+            return null;
+        }
+
+        // 이미 존재하는지 확인 (혹시 모를 중복 저장 방지)
+        StarScrap star = existsNoticeStar(member, post, postType);
+        if (star != null) {
+            return star;
+        }
+
+        star = StarScrap.builder()
+                .post(post)
+                .type(ActType.STAR)
+                .tableType(postType)
+                .member(member)
+                .build();
+
+        starScrapRepository.save(star);
+
+        return star;
+    }
+
+    /* Post(notice,faq) 공감 삭제 */
+    public boolean deleteNoticeStar(Long id, String type, Authentication authentication) {
+        Post post = null;
+        PostType postType = null;
+
+        if (type.equals("NOTICE")) {
+            post = noticeService.getNoticeDetail(id, null);
+            postType = PostType.NOTICE;
+        }
+        else if (type.equals("FAQ")) {
+            post = faqService.getFaqDetail(id, null);
+            postType = PostType.FAQ;
+        }
+
+        Member member = memberService.find(authentication.getName());
+        StarScrap star = existsNoticeStar(member, post, postType);
+
+        if (star == null) { // 혹시 모를 오류 방지
+            return false;
+        }
+
+        starScrapRepository.delete(star);
+
+        star = existsNoticeStar(member, post, postType);
+
+        if (star == null) {
+            return true;
+        } return false;
+    }
 
 
 

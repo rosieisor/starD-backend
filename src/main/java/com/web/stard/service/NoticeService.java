@@ -6,17 +6,19 @@ import com.web.stard.repository.StarScrapRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Transactional
 @Getter @Setter
@@ -45,10 +47,8 @@ public class NoticeService {
 
         for (Post p : posts) { // 스크랩 수, 공감 수
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.NOTICE);
-            List<StarScrap> allScrapList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.SCRAP, PostType.NOTICE);
 
             p.setStarCount(allStarList.size());
-            p.setScrapCount(allScrapList.size());
         }
 
         return posts;
@@ -75,10 +75,24 @@ public class NoticeService {
     }
 
     // Notice 상세 조회 (회원도 상세 조회 가능)
-    public Post getNoticeDetail(Long id) {
+    public Post getNoticeDetail(Long id, String userId) {
         Optional<Post> result = postRepository.findByIdAndType(id, PostType.NOTICE);
         if (result.isPresent()) {
-            return result.get();
+            Post post = result.get();
+
+            if (userId != null) {
+                if (!post.getMember().getId().equals(userId)) {
+                    // 작성자 != 현재 로그인 한 유저
+                    post.setViewCount(post.getViewCount()+1);
+                    postRepository.save(post);
+                }
+            }
+
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(post, ActType.STAR, PostType.NOTICE);
+
+            post.setStarCount(allStarList.size());
+
+            return post;
         }
         return null;
     }
@@ -86,7 +100,7 @@ public class NoticeService {
     // Notice 수정
     public Post updateNotice(Long id, Post requestPost, Authentication authentication) {
         Member member = memberService.find(authentication.getName());
-        Post post = getNoticeDetail(id);
+        Post post = getNoticeDetail(id, member.getAuthorities().toString());
 
         post.setTitle(requestPost.getTitle());
         post.setContent(requestPost.getContent());
@@ -111,5 +125,15 @@ public class NoticeService {
         });
     }
 
+    // id로 타입 찾기
+    public Optional<Post> findTypeById(Long id, Authentication authentication) {
+        return postRepository.findById(id);
+    }
+
+    // Notice, FAQ 최신 순 전체 보기
+    public List<Post> getAllNoticesAndFaqs() {
+        List<PostType> types = Arrays.asList(PostType.NOTICE, PostType.FAQ);
+        return postRepository.findByTypeInOrderByCreatedAtDesc(types);
+    }
 
 }
