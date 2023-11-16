@@ -41,7 +41,7 @@ public class EvaluationController {
     /* 평가 등록 */
     @PostMapping
     public Evaluation registerEvaluation(@RequestParam Long studyId, @RequestParam String targetId,
-                                         @RequestParam double starRating, @RequestParam String reason,
+                                         @RequestParam float starRating, @RequestParam String reason,
                                          Authentication authentication) {
         return evaluationService.registerEvaluation(studyId, targetId, starRating, reason, authentication);
     }
