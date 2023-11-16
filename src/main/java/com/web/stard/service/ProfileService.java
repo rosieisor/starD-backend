@@ -123,6 +123,17 @@ public class ProfileService {
         return profile;
     }
 
+    // [R] 개인 신뢰도 조회
+    public float getCredibility(String memberId) {
+        Member member = memberService.find(memberId);
+
+        if(member != null) {
+            Profile profile = member.getProfile();
+            return profile.getCredibility();
+        }
+        return -1;
+    }
+
 //    public Profile test(ProfileDto profileDto) {
 //
 //        MultipartFile file = profileDto.getImgFile();

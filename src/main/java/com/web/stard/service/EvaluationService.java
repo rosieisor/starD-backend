@@ -2,13 +2,16 @@ package com.web.stard.service;
 
 import com.web.stard.domain.Evaluation;
 import com.web.stard.domain.Member;
+import com.web.stard.domain.Profile;
 import com.web.stard.domain.Study;
 import com.web.stard.repository.EvaluationRepository;
+import com.web.stard.repository.ProfileRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +22,10 @@ import java.util.Optional;
 public class EvaluationService {
 
     EvaluationRepository evaluationRepository;
+    ProfileRepository profileRepository;
     MemberService memberService;
     StudyService studyService;
+    ProfileService profileService;
 
 
     public Evaluation findById(Long evaluationId) {
@@ -32,8 +37,8 @@ public class EvaluationService {
     }
 
     /* 평가 당한 내역 리스트 전체 조회 (전체 스터디) */
-    public List<Evaluation> getMyEvaluationList(Authentication authentication) {
-        Member target = memberService.find(authentication.getName());
+    public List<Evaluation> getMyEvaluationList(String memberId) {
+        Member target = memberService.find(memberId);
 
         return evaluationRepository.findByTargetOrderByStudyActivityDeadlineDesc(target);
     }
@@ -91,7 +96,8 @@ public class EvaluationService {
 
 
     /* 평가 등록 */
-    public Evaluation registerEvaluation(Long studyId, String targetId, double starRating,
+    @Transactional
+    public Evaluation registerEvaluation(Long studyId, String targetId, float starRating,
                                          String reason, Authentication authentication) {
         Study study = studyService.findById(studyId);
         Member member = memberService.find(authentication.getName()); // 작성자 (평가한 회원)
@@ -99,43 +105,53 @@ public class EvaluationService {
 
         Evaluation evaluation = new Evaluation(member, target, study, reason, starRating);
 
+        int originCount = getMyEvaluationList(targetId).size(); // 평가 인원 수
+        Profile updateProfile = target.getProfile();
+        float originCredibility = updateProfile.getCredibility(); // 기존 신뢰도
+        System.out.println("기존 : " + originCredibility + ", 반영 : " + starRating + ", 인원 : " + originCount);
+        float updateCredibility = evaluation.calculate(originCredibility, originCount);
+        System.out.println("결과 : " + updateCredibility);
+
+        updateProfile.setCredibility(updateCredibility);
+
         evaluationRepository.save(evaluation);
+        profileRepository.save(updateProfile);
 
         return evaluation;
     }
 
-    /* 평가 수정 */
-    public Evaluation updateEvaluation(Long evaluationId, double starRating,
-                                       String reason, Authentication authentication) {
-        Evaluation evaluation = findById(evaluationId);
-
-        if (!evaluation.getMember().getId().equals(authentication.getName())) {
-            // 자신이 한 평가가 아니면 수정 불가
-            return null;
-        }
-
-        evaluation.setStarRating(starRating);
-        evaluation.setReason(reason);
-
-        evaluationRepository.save(evaluation);
-
-        return evaluation;
-    }
-
-    /* 평가 삭제 */
-    public boolean deleteEvaluation(Long evaluationId, Authentication authentication) {
-        Evaluation evaluation = findById(evaluationId);
-
-        if (!evaluation.getMember().getId().equals(authentication.getName())) {
-            // 자신이 한 평가가 아니면 삭제 불가
-            return false;
-        }
-
-        evaluationRepository.delete(evaluation);
-
-        if (findById(evaluationId) == null) { // 삭제됨
-            return true;
-        } return false;
-    }
+//    /* 평가 수정 */
+//    public Evaluation updateEvaluation(Long evaluationId, float starRating,
+//                                       String reason, Authentication authentication) {
+//        Evaluation evaluation = findById(evaluationId);
+//
+//        if (!evaluation.getMember().getId().equals(authentication.getName())) {
+//            // 자신이 한 평가가 아니면 수정 불가
+//            return null;
+//        }
+//
+//        evaluation.setStarRating(starRating);
+//        evaluation.setReason(reason);
+//
+//        evaluationRepository.save(evaluation);
+//
+//        return evaluation;
+//    }
+//
+//    /* 평가 삭제 */
+//    public boolean deleteEvaluation(Long evaluationId, Authentication authentication) {
+//        Evaluation evaluation = findById(evaluationId);
+//
+//        if (!evaluation.getMember().getId().equals(authentication.getName())) {
+//            // 자신이 한 평가가 아니면 삭제 불가
+//            return false;
+//        }
+//
+//        evaluationRepository.delete(evaluation);
+//
+//        if (findById(evaluationId) == null) { // 삭제됨
+//            return true;
+//        } return false;
+//    }
 
 }

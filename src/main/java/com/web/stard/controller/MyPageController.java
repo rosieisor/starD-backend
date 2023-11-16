@@ -235,6 +235,12 @@ public class MyPageController {
         return profileService.updateCredibility(authentication.getName());
     }
 
+    // [R] 개인 신뢰도 조회
+    @GetMapping("/credibility")
+    public float getCredibility(Authentication authentication) {
+        return profileService.getCredibility(authentication.getName());
+    }
+
     // [R] 스터디 신청 내역
     @GetMapping("/apply-study")
     public Page<Applicant> findApplyHistory(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
@@ -259,7 +265,7 @@ public class MyPageController {
     /* 평가 당한 내역 리스트 전체 조회 (전체 스터디) */
     @GetMapping("/rate/target")
     public List<Evaluation> getMyEvaluationList(Authentication authentication) {
-        return evaluationService.getMyEvaluationList(authentication);
+        return evaluationService.getMyEvaluationList(authentication.getName());
     }
 
     /* 평가 당한 내역 리스트 조회 (스터디 별로) */
