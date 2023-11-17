@@ -24,7 +24,7 @@ public class FaqController {
     private  final FaqService faqService;
 
     // faq 등록
-    @PostMapping("")
+    @PostMapping
     public Post createFaq(@RequestBody Post post, Authentication authentication) {
         faqService.createFaq(post, authentication);
         return post;

@@ -65,10 +65,7 @@ public class NoticeService {
 
         for (Post p : posts) { // 스크랩 수, 공감 수
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.NOTICE);
-            List<StarScrap> allScrapList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.SCRAP, PostType.NOTICE);
-
             p.setStarCount(allStarList.size());
-            p.setScrapCount(allScrapList.size());
         }
 
         return posts;
@@ -128,12 +125,6 @@ public class NoticeService {
     // id로 타입 찾기
     public Optional<Post> findTypeById(Long id, Authentication authentication) {
         return postRepository.findById(id);
-    }
-
-    // Notice, FAQ 최신 순 전체 보기
-    public List<Post> getAllNoticesAndFaqs() {
-        List<PostType> types = Arrays.asList(PostType.NOTICE, PostType.FAQ);
-        return postRepository.findByTypeInOrderByCreatedAtDesc(types);
     }
 
 }

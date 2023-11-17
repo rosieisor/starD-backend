@@ -1,10 +1,8 @@
 package com.web.stard.service;
 
-import com.web.stard.domain.Member;
-import com.web.stard.domain.Post;
-import com.web.stard.domain.PostType;
-import com.web.stard.domain.Role;
+import com.web.stard.domain.*;
 import com.web.stard.repository.PostRepository;
+import com.web.stard.repository.StarScrapRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +27,7 @@ public class QnaService {
 
     MemberService memberService;
     PostRepository postRepository;
+    StarScrapRepository starScrapRepository;
 
     // qna 등록
     public Post createQna(Post post, Authentication authentication) {
@@ -51,20 +51,34 @@ public class QnaService {
     }
 
     // qna 상세 조회
-    public Post getQnaDetail(Long id) {
+    public Post getQnaDetail(Long id, String userId) {
         Optional<Post> result = postRepository.findByIdAndType(id, PostType.QNA);
         if (result.isPresent()) {
-            return result.get();
+            Post post = result.get();
+
+            if (userId != null) {
+                if (!post.getMember().getId().equals(userId)) {
+                    // 작성자 != 현재 로그인 한 유저
+                    post.setViewCount(post.getViewCount()+1);
+                    postRepository.save(post);
+                }
+            }
+
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(post, ActType.STAR, PostType.QNA);
+
+            post.setStarCount(allStarList.size());
+
+            return post;
         }
         return null;
     }
 
     // qna 수정
     public Post updateQna(Long id, Post requestPost, Authentication authentication) {
-        String userId = authentication.getName();
-        Post post = getQnaDetail(id);
+        Member member = memberService.find(authentication.getName());
+        Post post = getQnaDetail(id,null);
 
-        if (post.getMember().getId().equals(userId)) {  // 작성자일 때
+        if (member.getId().equals(post.getMember().getId())) {  // 작성자일 때
             post.setTitle(requestPost.getTitle());
             post.setContent(requestPost.getContent());
 
@@ -89,5 +103,24 @@ public class QnaService {
         });
     }
 
+    // faq, qna 순 최신 순 리스트 보기
+    public List<Post> getAllFaqsAndQnas() {
+        List<Post> faqs = postRepository.findByTypeOrderByCreatedAtDesc(PostType.FAQ);
+        for (Post p : faqs) { // 공감 수
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.FAQ);
+            p.setStarCount(allStarList.size());
+        }
 
+        List<Post> qnas = postRepository.findByTypeOrderByCreatedAtDesc(PostType.QNA);
+        for (Post p : qnas) { // 공감 수
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.QNA);
+            p.setStarCount(allStarList.size());
+        }
+
+        List<Post> allFaqsAndQnas = new ArrayList<>();
+        allFaqsAndQnas.addAll(faqs);
+        allFaqsAndQnas.addAll(qnas);
+
+        return allFaqsAndQnas;
+    }
 }
