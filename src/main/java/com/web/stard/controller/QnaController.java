@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -39,7 +40,14 @@ public class QnaController {
     // qna 상세 조회
     @GetMapping("/{id}")
     public Post getQnaDetail(@PathVariable Long id ) {
-        return qnaService.getQnaDetail(id);
+        String userId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            if (!id.equals("anonymousUser")) {
+                userId = authentication.getName(); // 사용자 아이디
+            }
+        }
+        return qnaService.getQnaDetail(id, userId);
     }
 
     // 수정
@@ -53,5 +61,11 @@ public class QnaController {
     @DeleteMapping("/{postId}")
     public void deleteQna(@PathVariable Long postId, Authentication authentication) {
         qnaService.deleteQna(postId, authentication);
+    }
+
+    // faq, qna 최신 순 전체 보기
+    @GetMapping("/all")
+    public List<Post> findAllFaqAndQna() {
+        return qnaService.getAllFaqsAndQnas();
     }
 }

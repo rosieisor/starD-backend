@@ -24,6 +24,7 @@ public class StarScrapService {
     StarScrapRepository starScrapRepository;
     NoticeService noticeService;
     FaqService faqService;
+    QnaService qnaService;
 
     /* Post(community) Star 여부 확인 */
     public StarScrap existsCommStar(Member member, Post post) {
@@ -181,8 +182,8 @@ public class StarScrapService {
 
 
 
-    // Notice, FAQ
-    /* Post(notice,faq) Star 여부 확인 */
+    // Notice, FAQ, QNA
+    /* Post(notice,faq,qna) Star 여부 확인 */
     public StarScrap existsNoticeStar(Member member, Post post, PostType postType) {
         Optional<StarScrap> star = starScrapRepository.findByMemberAndPostAndTypeAndTableType(member, post, ActType.STAR, postType);
 
@@ -191,7 +192,7 @@ public class StarScrapService {
         } return null;
     }
 
-    /* Post(notice,faq) 공감 추가 */
+    /* Post(notice,faq,qna) 공감 추가 */
     public StarScrap addNoticeStar(Long id, String type, Authentication authentication) {
         Post post = null;
         PostType postType = null;
@@ -203,6 +204,10 @@ public class StarScrapService {
         else if (type.equals("FAQ")) {
             post = faqService.getFaqDetail(id, null);
             postType = PostType.FAQ;
+        }
+        else if (type.equals("QNA")) {
+            post = qnaService.getQnaDetail(id, null);
+            postType = PostType.QNA;
         }
 
         Member member = memberService.find(authentication.getName());
@@ -230,7 +235,7 @@ public class StarScrapService {
         return star;
     }
 
-    /* Post(notice,faq) 공감 삭제 */
+    /* Post(notice,faq,qna) 공감 삭제 */
     public boolean deleteNoticeStar(Long id, String type, Authentication authentication) {
         Post post = null;
         PostType postType = null;
@@ -242,6 +247,10 @@ public class StarScrapService {
         else if (type.equals("FAQ")) {
             post = faqService.getFaqDetail(id, null);
             postType = PostType.FAQ;
+        }
+        else if (type.equals("QNA")) {
+            post = qnaService.getQnaDetail(id, null);
+            postType = PostType.QNA;
         }
 
         Member member = memberService.find(authentication.getName());

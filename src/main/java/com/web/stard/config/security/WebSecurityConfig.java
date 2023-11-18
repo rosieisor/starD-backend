@@ -73,6 +73,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/com/**",
             "/notice/**",
             "/faq/**",
+            "/qna/**",
 
             "/gs-guide-websocket",
 

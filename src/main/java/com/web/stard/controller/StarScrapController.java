@@ -21,6 +21,7 @@ public class StarScrapController {
     private final CommunityService communityService;
     private final NoticeService noticeService;
     private final FaqService faqService;
+    private final QnaService qnaService;
 
 
     /* Post(community) 공감 추가 */
@@ -66,14 +67,14 @@ public class StarScrapController {
         return starScrapService.deleteStudyStar(id, authentication);
     }
 
-    // Notice, FAQ
-    /* Post(notice,faq) 공감 추가 */
+    // Notice, FAQ, QNA
+    /* Post(notice,faq,qna) 공감 추가 */
     @PostMapping("/star/notice/{id}")
     public StarScrap addNoticeStar(@PathVariable Long id, @RequestParam String type, Authentication authentication) {
         return starScrapService.addNoticeStar(id, type, authentication);
     }
 
-    /* Post(notice,faq) 공감 여부 확인 */
+    /* Post(notice,faq,qna) 공감 여부 확인 */
     @GetMapping("/star/notice/{id}")
     public Boolean getNoticeStar(@PathVariable Long id, @RequestParam String type, Authentication authentication) {
         Member member = memberService.find(authentication.getName());
@@ -88,6 +89,10 @@ public class StarScrapController {
             post = faqService.getFaqDetail(id, null);
             postType = PostType.FAQ;
         }
+        else if (type.equals("QNA")) {
+            post = qnaService.getQnaDetail(id, null);
+            postType = PostType.QNA;
+        }
 
         StarScrap starScrap = starScrapService.existsNoticeStar(member, post, postType);
 
@@ -97,7 +102,7 @@ public class StarScrapController {
         return true;
     }
 
-    /* Post(notice,faq) 공감 삭제 */
+    /* Post(notice,faq,qna) 공감 삭제 */
     @DeleteMapping("/star/notice/{id}")
     public boolean deleteNoticeStar(@PathVariable Long id, @RequestParam String type, Authentication authentication) {
         return starScrapService.deleteNoticeStar(id, type, authentication);
