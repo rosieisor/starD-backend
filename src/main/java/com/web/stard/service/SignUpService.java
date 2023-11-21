@@ -85,6 +85,9 @@ public class SignUpService {
         Profile profile = profileService.createProfile();
         member.setProfile(profile);
 
+        // 신고 횟수 0으로 초기화
+        member.setReportCount(0);
+        
         return memberRepository.save(member);
     }
 
