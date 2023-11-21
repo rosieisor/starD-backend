@@ -193,7 +193,7 @@ public class ReportService {
     }
 
     // 특정 report의 신고 횟수 조회
-    public long getReportCountForReport(Long reportId) {
+    public Long getReportCountForReport(Long reportId) {
         return reportDetailRepository.countByReportId(reportId);
     }
 
@@ -205,8 +205,10 @@ public class ReportService {
         List<Report> resultList = new ArrayList<>();
 
         for (Report report : reports) {
-            long reportCount = getReportCountForReport(report.getId());
-            if (reportCount >= 5) {
+            Long reportCount = getReportCountForReport(report.getId());
+
+            // TODO 1->5로 수정하기
+            if (reportCount >= 1) {
                 resultList.add(report);
             }
         }

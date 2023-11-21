@@ -86,6 +86,12 @@ public class ReportController {
         return reportService.createReplyReport(targetIdLong, reasonType, customReason, authentication);
     }
 
+    // 특정 report의 신고 횟수 조회
+    @GetMapping("/report-count/{reportId}")
+    public Long getReportCounts(@PathVariable Long reportId, Authentication authentication) {
+        return reportService.getReportCountForReport(reportId);
+    }
+
     // 신고 목록 조회 (누적 신고 수가 5회 이상인)
     @GetMapping()
     public List<Report> getReports(Authentication authentication) {
