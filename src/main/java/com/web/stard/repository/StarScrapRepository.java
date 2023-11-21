@@ -14,6 +14,9 @@ public interface StarScrapRepository extends JpaRepository<StarScrap, Long> {
     /* 사용자가 해당 Study를 공감(스크랩)했는지 */
     Optional<StarScrap> findByMemberAndStudyAndTypeAndTableType(Member member, Study study, ActType type, PostType postType);
 
+    /* 사용자가 해당 StudyPost를 공감(스크랩)했는지 */
+    Optional<StarScrap> findByMemberAndStudyPostAndTypeAndTableType(Member member, StudyPost studyPost, ActType type, PostType postType);
+
     /* 사용자가 공감(스크랩)한 타입별 모든 게시글 */
     List<StarScrap> findAllByMemberAndTypeAndTableType(Member member, ActType type, PostType postType);
 
@@ -22,4 +25,7 @@ public interface StarScrapRepository extends JpaRepository<StarScrap, Long> {
 
     /* 해당 Study의 공감(스크랩) 전체 조회 */
     List<StarScrap> findAllByStudyAndTypeAndTableType(Study study, ActType actType, PostType postType);
+
+    /* 해당 StudyPost의 공감 전체 조회 */
+    List<StarScrap> findAllByStudyPostAndTypeAndTableType(StudyPost studyPost, ActType actType, PostType postType);
 }

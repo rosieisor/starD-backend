@@ -39,8 +39,9 @@ public class CommunityController {
     public Post getCommunityPost(@PathVariable Long id) {
         String userId = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getName());
         if (authentication != null && authentication.isAuthenticated()) {
-            if (!id.equals("anonymousUser")) {
+            if (!authentication.getName().equals("anonymousUser")) {
                 userId = authentication.getName(); // 사용자 아이디
             }
         }

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,13 +30,21 @@ public class StudyPostController {
     /* 게시글 상세 조회 */
     @GetMapping("/{postId}")
     public StudyPost getStudyPost(@PathVariable Long postId) {
-        return studyPostService.getStudyPost(postId);
+        String userId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            if (!authentication.getName().equals("anonymousUser")) {
+                userId = authentication.getName(); // 사용자 아이디
+            }
+        }
+        return studyPostService.getStudyPost(postId, userId);
     }
 
     /* 게시글 등록 */
     @PostMapping
     public StudyPost registerPost(@RequestParam Long studyId, @RequestParam String title,
-                                  @RequestParam String content, @RequestParam MultipartFile file,
+                                  @RequestParam(required = false) String content,
+                                  @RequestParam(required = false) MultipartFile file,
                                   Authentication authentication) {
         return studyPostService.registerPost(studyId, title, content, file, authentication);
     }

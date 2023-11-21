@@ -25,6 +25,7 @@ public class StarScrapService {
     NoticeService noticeService;
     FaqService faqService;
     QnaService qnaService;
+    StudyPostService studyPostService;
 
     /* Post(community) Star 여부 확인 */
     public StarScrap existsCommStar(Member member, Post post) {
@@ -606,5 +607,58 @@ public class StarScrapService {
         }
 
         return starScraps;
+    }
+
+
+    /* StudyPost Star 여부 확인 */
+    public StarScrap existsStudyPostStar(Member member, StudyPost studyPost) {
+        Optional<StarScrap> star = starScrapRepository.findByMemberAndStudyPostAndTypeAndTableType(member, studyPost, ActType.STAR, PostType.STUDYPOST);
+
+        if (star.isPresent()) {
+            return star.get();
+        } return null;
+    }
+
+    /* StudyPost Star 추가 */
+    public StarScrap addStudyPostStar(Long id, Authentication authentication) {
+        StudyPost studyPost = studyPostService.getStudyPost(id, null);
+        Member member = memberService.find(authentication.getName());
+
+        // 이미 존재하는지 확인 (혹시 모를 중복 저장 방지)
+        StarScrap star = existsStudyPostStar(member, studyPost);
+        if (star != null) {
+            return star;
+        }
+
+        System.out.println("post id : " + studyPost.getId());
+
+        star = StarScrap.builder()
+                .studyPost(studyPost)
+                .type(ActType.STAR)
+                .tableType(PostType.STUDYPOST)
+                .member(member)
+                .build();
+
+        starScrapRepository.save(star);
+
+        return star;
+    }
+
+    /* StudyPost Star 삭제 */
+    public boolean deleteStudyPostStar(Long id, Authentication authentication) {
+        StudyPost studyPost = studyPostService.getStudyPost(id, null);
+        Member member = memberService.find(authentication.getName());
+        StarScrap star = existsStudyPostStar(member, studyPost);
+
+        if (star == null) { // 혹시 모를 오류 방지
+            return false;
+        }
+
+        starScrapRepository.delete(star);
+
+        star = existsStudyPostStar(member, studyPost);
+        if (star == null) {
+            return true;
+        } return false;
     }
 }

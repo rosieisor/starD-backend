@@ -28,11 +28,19 @@ public class StudyPost extends BaseEntity {
 
     private String content; // 내용
 
+    @NotNull @Column(name = "view_count")
+    private int viewCount;
+
     @Column(name = "file_name")
     private String fileName; // 파일 이름
 
     @Column(name = "file_url")
     private String fileUrl; // 파일 경로
+
+
+
+    @Transient // DB랑 매핑되지 않음
+    private int starCount; // 공감 수
 
 
 

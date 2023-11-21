@@ -22,6 +22,7 @@ public class StarScrapController {
     private final NoticeService noticeService;
     private final FaqService faqService;
     private final QnaService qnaService;
+    private final StudyPostService studyPostService;
 
 
     /* Post(community) 공감 추가 */
@@ -218,6 +219,32 @@ public class StarScrapController {
                                                          Authentication authentication,
                                                          @RequestParam String keyword, @RequestParam String type) {
         return starScrapService.getStudySearchStarScraps(page, authentication, "recruiter", keyword, type);
+    }
+
+
+    /* StudyPost 공감 여부 확인 */
+    @GetMapping("/star/studypost/{id}")
+    public Boolean getStudyPostStar(@PathVariable Long id, Authentication authentication) {
+        Member member = memberService.find(authentication.getName());
+        StudyPost studyPost = studyPostService.getStudyPost(id, null);
+        StarScrap starScrap = starScrapService.existsStudyPostStar(member, studyPost);
+        if (starScrap == null) {
+            return false;
+        }
+        return true;
+    }
+
+    /* StudyPost 공감 추가 */
+    @PostMapping("/star/studypost/{id}")
+    public StarScrap addStudyPostStar(@PathVariable Long id, Authentication authentication) {
+        System.out.println("아이디 : " + id);
+        return starScrapService.addStudyPostStar(id, authentication);
+    }
+
+    /* StudyPost 공감 삭제 */
+    @DeleteMapping("/star/studypost/{id}")
+    public boolean deleteStudyPostStar(@PathVariable Long id, Authentication authentication) {
+        return starScrapService.deleteStudyPostStar(id, authentication);
     }
 
 
