@@ -221,4 +221,74 @@ public class LocationService {
 
         return location;
     }
+
+    /* 위도, 경도를 address로 변환 */
+    public String reverseGeocoder(Double latitude, Double longitude) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.add("X-NCP-APIGW-API-KEY-ID", clientId);
+            headers.add("X-NCP-APIGW-API-KEY", clientSecret);
+
+            String coords = String.valueOf(longitude)+","+String.valueOf(latitude);
+
+            System.out.println("파라미터 : " + coords);
+
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc")
+                    .queryParam("coords", coords)
+                    .queryParam("orders", "roadaddr")
+                    .queryParam("output", "json");
+
+            RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, URI.create(builder.toUriString()));
+
+            ResponseEntity<String> response = restTemplate.exchange(requestEntity, String.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) { // 200
+                String jsonResponse = response.getBody();
+
+                System.out.println(jsonResponse);
+
+                // 파싱
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+
+                JsonNode resultNode = jsonNode.path("results").get(0);
+                String area1 = resultNode.path("region").path("area1").path("name").asText();
+                String area2 = resultNode.path("region").path("area2").path("name").asText();
+//                String area3 = resultNode.path("region").path("area3").path("name").asText();
+//                String area4 = resultNode.path("region").path("area4").path("name").asText();
+                String roadName1 = resultNode.path("land").path("name").asText();
+                String roadName2 = resultNode.path("land").path("number1").asText();
+                String roadName3 = resultNode.path("land").path("number2").asText();
+
+                String address = area1 + " " + area2;
+//                if (!area3.isBlank()) {
+//                    address += " " + area3;
+//
+//                    if (!area4.isBlank()) {
+//                        address += " " + area4;
+//                    }
+//                }
+                address += " " + roadName1;
+                if (!roadName2.isBlank()) {
+                    address += " " + roadName2;
+
+                    if (!roadName3.isBlank()) {
+                        address += "-" + roadName3;
+                    }
+                }
+
+                System.out.println("도로명주소 : " + address);
+
+                return address;
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return null;
+    }
 }

@@ -38,4 +38,10 @@ public class LocationController {
         }
         return locationService.getFindMidpoint(placeList);
     }
+
+    @GetMapping("/reverse/geocoder")
+    public String getAddress(@RequestParam Double latitude, @RequestParam Double longitude,
+                             Authentication authentication) throws Exception {
+        return locationService.reverseGeocoder(latitude, longitude);
+    }
 }
