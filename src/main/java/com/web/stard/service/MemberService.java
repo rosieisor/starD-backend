@@ -7,7 +7,6 @@ import com.web.stard.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -196,7 +195,7 @@ public class MemberService {
             studyRepository.save(study);
         }
 
-        List<StudyMember> updateStudyMember = studyMemberRepository.findByMemberAndStudyProgressStatus(member, ProgressStatus.WRAP_UP);
+        List<StudyMember> updateStudyMember = studyMemberRepository.findByMemberAndStudyProgressStatusOrderByIdDesc(member, ProgressStatus.WRAP_UP);
         for (StudyMember studyMember : updateStudyMember) {
             studyMember.setMember(updateMember);
             studyMemberRepository.save(studyMember);

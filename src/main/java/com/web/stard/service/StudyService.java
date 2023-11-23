@@ -1,7 +1,6 @@
 package com.web.stard.service;
 
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import com.web.stard.domain.*;
 import com.web.stard.dto.StudyDto;
 import com.web.stard.dto.response.Top5Dto;
@@ -9,20 +8,16 @@ import com.web.stard.repository.ApplicantRepository;
 import com.web.stard.repository.StudyMemberRepository;
 import com.web.stard.repository.StudyRepository;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -167,6 +162,13 @@ public class StudyService {
         Page<StudyMember> studies = studyMemberRepository.findByMember(member, pageable);
         System.out.println(studies.getTotalElements());
         return studies;
+    }
+
+    /* 사용자별 진행 완료된 스터디 조회 */
+    public List<StudyMember> findWrapUpStudy(Authentication authentication) {
+        Member member = memberService.find(authentication.getName());
+
+        return studyMemberRepository.findByMemberAndStudyProgressStatusOrderByIdDesc(member, ProgressStatus.WRAP_UP);
     }
 
     @Transactional
