@@ -4,7 +4,6 @@ import com.web.stard.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -23,5 +22,5 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
     /* 특정 회원의 진행 중인 스터디가 있는지 */
     List<StudyMember> findByMemberAndStudyProgressStatusIn(Member member, List<ProgressStatus> progressStatusList);
     /* 진행 완료된 스터디로 검색 */
-    List<StudyMember> findByMemberAndStudyProgressStatus(Member member, ProgressStatus progressStatus);
+    List<StudyMember> findByMemberAndStudyProgressStatusOrderByIdDesc(Member member, ProgressStatus progressStatus);
 }

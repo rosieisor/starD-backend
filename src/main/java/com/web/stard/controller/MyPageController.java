@@ -262,6 +262,12 @@ public class MyPageController {
     }
 
 
+    /* 진행 완료된 스터디 리스트 조회 */
+    @GetMapping("/wrap-up-study")
+    public List<StudyMember> findWrapUpStudy(Authentication authentication) {
+        return studyService.findWrapUpStudy(authentication);
+    }
+
     /* 평가 당한 내역 리스트 전체 조회 (전체 스터디) */
     @GetMapping("/rate/target")
     public List<Evaluation> getMyEvaluationList(Authentication authentication) {
@@ -269,7 +275,7 @@ public class MyPageController {
     }
 
     /* 평가 당한 내역 리스트 조회 (스터디 별로) */
-    @GetMapping("/rate/target/{studyId}")
+    @GetMapping("/rate/target/study/{studyId}")
     public List<Evaluation> getMyEvaluationListByStudy(@PathVariable Long studyId, Authentication authentication) {
         return evaluationService.getMyEvaluationListByStudy(studyId, authentication);
     }
