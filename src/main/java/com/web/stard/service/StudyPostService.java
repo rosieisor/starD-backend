@@ -8,12 +8,18 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -207,5 +213,23 @@ public class StudyPostService {
         }
 
         return posts;
+    }
+
+    /* 파일 다운로드 */
+    public ResponseEntity<Resource> download(Long postId) {
+        StudyPost post = getStudyPost(postId, null);
+
+        try {
+            Path filePath = Paths.get(uploadFolder, String.valueOf(post.getStudy().getId()), post.getFileUrl());
+
+            Resource resource = new UrlResource(filePath.toUri());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+        } catch (IOException e) {
+            // 파일 다운로드 중 오류가 발생할 경우 예외 처리
+            throw new RuntimeException(e);
+        }
     }
 }

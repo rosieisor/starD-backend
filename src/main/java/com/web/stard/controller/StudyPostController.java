@@ -5,6 +5,8 @@ import com.web.stard.service.StudyPostService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +69,14 @@ public class StudyPostController {
     /* 검색 */
     @GetMapping("/search/{studyId}")
     public List<StudyPost> searchStudyPost(@PathVariable Long studyId,
-                                           @RequestParam String searchType, @RequestParam String searchWord) {
+                                           @RequestParam String searchType, @RequestParam String searchWord,
+                                           Authentication authentication) {
         return studyPostService.searchStudyPost(studyId, searchType, searchWord);
+    }
+
+    /* 파일 다운로드 */
+    @GetMapping("/download/{studyId}")
+    public ResponseEntity<Resource> download(@PathVariable Long studyId, Authentication authentication) {
+        return studyPostService.download(studyId);
     }
 }
