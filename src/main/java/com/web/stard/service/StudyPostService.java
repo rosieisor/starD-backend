@@ -182,4 +182,30 @@ public class StudyPostService {
             }
         }
     }
+
+    /* 검색 */
+    public List<StudyPost> searchStudyPost(Long studyId, String searchType, String searchWord) {
+        Study study = studyService.findById(studyId);
+        List<StudyPost> posts;
+
+        if (searchType.equals("제목")) {
+            posts = studyPostRepository.findByStudyAndTitleContainingOrderByCreatedAtDesc(study, searchWord);
+        } else if (searchType.equals("내용")) {
+            posts = studyPostRepository.findByStudyAndContentContainingOrderByCreatedAtDesc(study, searchWord);
+        } else { // 닉네임
+            Member member = memberService.findByNickname(searchWord);
+            if (member == null) {
+                return null;
+            }
+            posts = studyPostRepository.findByStudyAndMemberOrderByCreatedAtDesc(study, member);
+        }
+
+        for (StudyPost p : posts) {
+            List<StarScrap> allStarList = starScrapRepository.findAllByStudyPostAndTypeAndTableType(p, ActType.STAR, PostType.STUDYPOST);
+
+            p.setStarCount(allStarList.size());
+        }
+
+        return posts;
+    }
 }

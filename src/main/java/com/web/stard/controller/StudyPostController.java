@@ -63,4 +63,11 @@ public class StudyPostController {
     public boolean deletePost(@PathVariable Long postId, Authentication authentication) {
         return studyPostService.deletePost(postId);
     }
+
+    /* 검색 */
+    @GetMapping("/search/{studyId}")
+    public List<StudyPost> searchStudyPost(@PathVariable Long studyId,
+                                           @RequestParam String searchType, @RequestParam String searchWord) {
+        return studyPostService.searchStudyPost(studyId, searchType, searchWord);
+    }
 }
