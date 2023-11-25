@@ -52,7 +52,8 @@ public class StudyPostController {
     /* 게시글 수정 */
     @PostMapping("/{postId}")
     public StudyPost updatePost(@PathVariable Long postId, @RequestParam String title,
-                                @RequestParam String content, @RequestParam MultipartFile file,
+                                @RequestParam(required = false) String content,
+                                @RequestParam(required = false) MultipartFile file,
                                 Authentication authentication) {
         return studyPostService.updatePost(postId, title, content, file);
     }

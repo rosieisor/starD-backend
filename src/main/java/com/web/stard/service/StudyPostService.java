@@ -105,38 +105,74 @@ public class StudyPostService {
         studyPost.setTitle(title);
         studyPost.setContent(content);
 
-        File folder = new File(uploadFolder);
-
-        if (!folder.exists()) {
-            folder.mkdirs(); // 디렉토리 생성
+        String originFileUrl = "";
+        if (studyPost.getFileUrl() != null) {
+            originFileUrl = studyPost.getFileUrl();
         }
 
-        UUID uuid = UUID.randomUUID();
-        String fileName = uuid + "_" + file.getOriginalFilename();
-        File destinationFile = new File(uploadFolder + studyPost.getStudy().getId());
+        if (file == null) {
+            // 새로운 파일이 없는 경우
+            studyPost.setFileName(null);
+            studyPost.setFileUrl(null);
+        } else {
+            File folder = new File(uploadFolder + studyPost.getStudy().getId());
 
-        try {
-            file.transferTo(destinationFile);
+            if (!folder.exists()) {
+                folder.mkdirs(); // 디렉토리 생성
+            }
 
-            studyPost.setFileName(file.getOriginalFilename());
-            studyPost.setFileUrl("/" + fileName);
+            UUID uuid = UUID.randomUUID();
+            String fileName = uuid + "_" + file.getOriginalFilename();
+            File destinationFile = new File(uploadFolder + studyPost.getStudy().getId() + "/" + fileName);
 
-            studyPostRepository.save(studyPost);
+            try {
+                file.transferTo(destinationFile);
 
-            return studyPost;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+                studyPost.setFileName(file.getOriginalFilename());
+                studyPost.setFileUrl("/" + fileName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+        studyPostRepository.save(studyPost);
+
+        // 기존 파일 삭제
+        deleteFile(studyPost.getStudy().getId(), originFileUrl);
+
+        return studyPost;
     }
 
     /* 게시글 삭제 */
     public boolean deletePost(Long postId) {
         StudyPost studyPost = getStudyPost(postId, null);
 
+        Long studyId = studyPost.getStudy().getId();
+        String fileUrl = studyPost.getFileUrl();
+
         studyPostRepository.delete(studyPost);
 
         if (getStudyPost(postId, null) == null) { // 삭제됨
+            deleteFile(studyPost.getStudy().getId(), studyPost.getFileUrl()); // 파일도 삭제
+            
             return true;
         } return false;
+    }
+
+    /* 파일 삭제 */
+    private void deleteFile(Long studyId, String filePath) {
+        if (filePath != null && !filePath.isEmpty()) {
+            try {
+                // 파일 경로를 이용하여 파일 객체 생성
+                File fileToDelete = new File(uploadFolder + studyId + filePath);
+
+                // 파일이 존재하면 삭제
+                if (fileToDelete.exists()) {
+                    fileToDelete.delete();
+                }
+            } catch (Exception e) {
+                // 파일 삭제 중 오류가 발생할 경우 예외 처리
+                e.printStackTrace();
+            }
+        }
     }
 }
