@@ -33,8 +33,15 @@ public class StudyPostService {
     /* 게시글 전체 조회 */
     public List<StudyPost> getStudyPostList(Long studyId) {
         Study study = studyService.findById(studyId);
+        List<StudyPost> posts = studyPostRepository.findByStudyOrderByCreatedAtDesc(study);
 
-        return studyPostRepository.findByStudyOrderByCreatedAtDesc(study);
+        for (StudyPost p : posts) {
+            List<StarScrap> allStarList = starScrapRepository.findAllByStudyPostAndTypeAndTableType(p, ActType.STAR, PostType.STUDYPOST);
+
+            p.setStarCount(allStarList.size());
+        }
+
+        return posts;
     }
 
     /* 게시글 상세 조회 */
