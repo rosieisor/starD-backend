@@ -15,4 +15,11 @@ public interface StudyPostRepository extends JpaRepository<StudyPost, Long> {
 
     /* 완료된 스터디로 검색 */
     List<StudyPost> findByMemberAndStudyProgressStatus(Member member, ProgressStatus progressStatus);
+    
+    /* 제목 검색 */
+    List<StudyPost> findByStudyAndTitleContainingOrderByCreatedAtDesc(Study study, String title);
+    /* 내용 검색 */
+    List<StudyPost> findByStudyAndContentContainingOrderByCreatedAtDesc(Study study, String content);
+    /* 닉네임 검색 */
+    List<StudyPost> findByStudyAndMemberOrderByCreatedAtDesc(Study study, Member member);
 }

@@ -5,6 +5,8 @@ import com.web.stard.service.StudyPostService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +54,8 @@ public class StudyPostController {
     /* 게시글 수정 */
     @PostMapping("/{postId}")
     public StudyPost updatePost(@PathVariable Long postId, @RequestParam String title,
-                                @RequestParam String content, @RequestParam MultipartFile file,
+                                @RequestParam(required = false) String content,
+                                @RequestParam(required = false) MultipartFile file,
                                 Authentication authentication) {
         return studyPostService.updatePost(postId, title, content, file);
     }
@@ -61,5 +64,19 @@ public class StudyPostController {
     @DeleteMapping("{postId}")
     public boolean deletePost(@PathVariable Long postId, Authentication authentication) {
         return studyPostService.deletePost(postId);
+    }
+
+    /* 검색 */
+    @GetMapping("/search/{studyId}")
+    public List<StudyPost> searchStudyPost(@PathVariable Long studyId,
+                                           @RequestParam String searchType, @RequestParam String searchWord,
+                                           Authentication authentication) {
+        return studyPostService.searchStudyPost(studyId, searchType, searchWord);
+    }
+
+    /* 파일 다운로드 */
+    @GetMapping("/download/{studyId}")
+    public ResponseEntity<Resource> download(@PathVariable Long studyId, Authentication authentication) {
+        return studyPostService.download(studyId);
     }
 }
