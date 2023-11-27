@@ -6,12 +6,18 @@ import com.web.stard.dto.ProfileDto;
 import com.web.stard.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,7 +77,7 @@ public class ProfileService {
         try {
             imgFile.transferTo(destinationFile);
 
-            profile.setImgUrl("/profileImages/" + imageFileName);
+            profile.setImgUrl("profileImages/" + imageFileName);
             profile.setImgName(imgFile.getOriginalFilename());
             profile.setIntroduce(introduce);
 
@@ -132,6 +138,28 @@ public class ProfileService {
             return profile.getCredibility();
         }
         return -1;
+    }
+
+    // [R] 프로필 이미지 조회
+    public ResponseEntity<Resource> getProfileImage(String imageUrl) throws IOException {
+
+        String path = uploadFolder + imageUrl.substring("profileImages/".length());
+        System.out.printf(path);
+
+        Resource resource = new ClassPathResource(path);
+
+        // 리소스를 읽어오지 못했다면 404 에러 반환
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // 이미지 파일의 MIME 타입 설정
+        String contentType = Files.probeContentType(Paths.get(resource.getURI()));
+
+        // ResponseEntity 사용하여 이미지 파일 반환
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
     }
 
 //    public Profile test(ProfileDto profileDto) {
