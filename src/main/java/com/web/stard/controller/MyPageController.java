@@ -227,8 +227,9 @@ public class MyPageController {
         return profileService.getProfile(authentication.getName());
     }
 
-    @GetMapping("/profile/image")
-    public ResponseEntity<Resource> getImage(String imageUrl) throws IOException {
+    // [R] 프로필 이미지 조회
+    @GetMapping("/profile/image/{imageUrl}")
+    public ResponseEntity<Resource> getImage(@PathVariable String imageUrl) throws IOException {
         return profileService.getProfileImage(imageUrl);
     }
 
