@@ -30,11 +30,11 @@ public class ReportController {
         if (reason.equals("ABUSE")) {
             reasonType = ReportReason.ABUSE;
         } else if (reason.equals("SPAM")) {
-            reasonType = ReportReason.PROMOTION;
-        } else if (reason.equals("PROMOTION")) {
-            reasonType = ReportReason.ADULT;
-        } else if (reason.equals("ADULT")) {
             reasonType = ReportReason.SPAM;
+        } else if (reason.equals("PROMOTION")) {
+            reasonType = ReportReason.PROMOTION;
+        } else if (reason.equals("ADULT")) {
+            reasonType = ReportReason.ADULT;
         } else if (reason.equals("ETC")) {
             reasonType = ReportReason.ETC;
         }
@@ -70,6 +70,22 @@ public class ReportController {
 
         return reportService.createStudyReport(targetIdLong, reasonType, customReason, authentication);
     }
+
+    // Study Post 글 신고
+    @PostMapping("/studyposts")
+    public ReportDetail createStudyPostReport(@RequestBody Map<String, Object> requestPayload, Authentication authentication) {
+        Integer targetIdStr = (Integer) requestPayload.get("id");
+        //Integer replyId = Integer.parseInt(targetIdStr);
+
+        String reason = (String) requestPayload.get("reason");
+        String customReason = (String) requestPayload.get("customReason");
+
+        Long targetIdLong = targetIdStr.longValue();
+        ReportReason reasonType = reportReason(reason);
+
+        return reportService.createStudyPostReport(targetIdLong, reasonType, customReason, authentication);
+    }
+
 
     // 댓글 신고
     @PostMapping("/replies")

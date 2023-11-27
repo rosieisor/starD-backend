@@ -3,6 +3,7 @@ package com.web.stard.service;
 import com.web.stard.domain.*;
 import com.web.stard.repository.PostRepository;
 import com.web.stard.repository.ReplyRepository;
+import com.web.stard.repository.StudyPostRepository;
 import com.web.stard.repository.StudyRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,8 @@ public class ReplyService {
     ReplyRepository replyRepository;
     StudyService studyService;
     StudyRepository studyRepository;
+    StudyPostService studyPostService;
+    StudyPostRepository studyPostRepository;
 
     // 댓글이 존재하는지 확인
     private Reply getExistingReply(Long replyId) {
@@ -90,6 +93,22 @@ public class ReplyService {
         return replyRepository.save(reply);
     }
 
+    // StudyPost 댓글 생성
+    public Reply createStudyPostReply(Long studyPostId, String replyContent, Authentication authentication) {
+        String userId = authentication.getName();
+        Member replier = memberService.find(userId);
+        StudyPost targetStudyPost = studyPostService.getStudyPost(studyPostId, null);
+
+        Reply reply = Reply.builder()
+                .member(replier)
+                .studyPost(targetStudyPost)
+                .content(replyContent)
+                .type(PostType.STUDYPOST)
+                .build();
+
+        return replyRepository.save(reply);
+    }
+
     // 댓글 수정 (Post, Study 공통)
     public Reply updateReply(Long replyId, String replyContent, Authentication authentication) {
         String userId = authentication.getName();
@@ -143,7 +162,12 @@ public class ReplyService {
         return replyRepository.findAllByStudyIdOrderByCreatedAtAsc(studyId);
     }
 
-    // 해당 id로 타입 조회 (댓글 작성 및 신고할 때 사용) - COMM, QNA, NOTICE, FAQ, STUDY, REPLY
+    // studyPost 게시글 아이디 별 댓글 조회 (생성일 순)
+    public List<Reply> findAllRepliesByStudyPostIdOrderByCreatedAtAsc(Long studyId) {
+        return replyRepository.findAllByStudyPostIdOrderByCreatedAtAsc(studyId);
+    }
+
+    // 해당 id로 타입 조회 (댓글 작성 및 신고할 때 사용) - COMM, QNA, NOTICE, FAQ, STUDY, REPLY, STUDYPOST
     public PostType findPostTypeById(Long id) {
         // Post 조회
         Optional<Post> postOptional = postRepository.findById(id);
@@ -157,6 +181,12 @@ public class ReplyService {
         Optional<Study> studyOptional = studyRepository.findById(id);
         if (studyOptional.isPresent() && studyOptional.get().getOnOff() != null) {
             return studyOptional.get().getType();
+        }
+
+        // Study Post 조회
+        Optional<StudyPost> studyPostOptional = studyPostRepository.findById(id);
+        if (studyPostOptional.isPresent() && studyPostOptional.get().getStudy() != null) {
+            return studyPostOptional.get().getType();
         }
 
         // Reply 조회
