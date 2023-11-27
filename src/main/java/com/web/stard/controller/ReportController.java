@@ -71,6 +71,22 @@ public class ReportController {
         return reportService.createStudyReport(targetIdLong, reasonType, customReason, authentication);
     }
 
+    // Study Post 글 신고
+    @PostMapping("/studyposts")
+    public ReportDetail createStudyPostReport(@RequestBody Map<String, Object> requestPayload, Authentication authentication) {
+        Integer targetIdStr = (Integer) requestPayload.get("id");
+        //Integer replyId = Integer.parseInt(targetIdStr);
+
+        String reason = (String) requestPayload.get("reason");
+        String customReason = (String) requestPayload.get("customReason");
+
+        Long targetIdLong = targetIdStr.longValue();
+        ReportReason reasonType = reportReason(reason);
+
+        return reportService.createStudyPostReport(targetIdLong, reasonType, customReason, authentication);
+    }
+
+
     // 댓글 신고
     @PostMapping("/replies")
     public ReportDetail createReplyReport(@RequestBody Map<String, Object> requestPayload, Authentication authentication) {
