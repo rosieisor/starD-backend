@@ -30,11 +30,11 @@ public class ReportController {
         if (reason.equals("ABUSE")) {
             reasonType = ReportReason.ABUSE;
         } else if (reason.equals("SPAM")) {
-            reasonType = ReportReason.PROMOTION;
-        } else if (reason.equals("PROMOTION")) {
-            reasonType = ReportReason.ADULT;
-        } else if (reason.equals("ADULT")) {
             reasonType = ReportReason.SPAM;
+        } else if (reason.equals("PROMOTION")) {
+            reasonType = ReportReason.PROMOTION;
+        } else if (reason.equals("ADULT")) {
+            reasonType = ReportReason.ADULT;
         } else if (reason.equals("ETC")) {
             reasonType = ReportReason.ETC;
         }
