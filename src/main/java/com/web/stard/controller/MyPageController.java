@@ -1,16 +1,15 @@
 package com.web.stard.controller;
 
 import com.web.stard.domain.*;
-import com.web.stard.dto.ProfileDto;
 import com.web.stard.service.EvaluationService;
 import com.web.stard.service.MemberService;
 import com.web.stard.service.ProfileService;
 import com.web.stard.service.StudyService;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Getter @Setter
 @RestController
@@ -227,6 +225,11 @@ public class MyPageController {
     @GetMapping("/profile")
     public Profile getProfile(Authentication authentication) {
         return profileService.getProfile(authentication.getName());
+    }
+
+    @GetMapping("/profile/image")
+    public ResponseEntity<Resource> getImage(String imageUrl) throws IOException {
+        return profileService.getProfileImage(imageUrl);
     }
 
     // [U] 개인 신뢰도 수정
