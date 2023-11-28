@@ -31,6 +31,7 @@ public class ReportService {
     private ReplyRepository replyRepository;
     private ReplyService replyService;
     private MemberRepository memberRepository;
+    private StudyPostRepository studyPostRepository;
 
     // 해당 글이 이미 신고되었는지 확인
     private Report isTargetPostAlreadyReported(Long targetId, PostType postType) {
@@ -44,6 +45,9 @@ public class ReportService {
         }
         else if (postType == PostType.REPLY) {
             report = reportRepository.findByReplyId(targetId);
+        }
+        else if (postType == PostType.STUDYPOST) {
+            report = reportRepository.findByStudyPostId(targetId);
         }
 
         return report;
@@ -139,6 +143,40 @@ public class ReportService {
             Report report = Report.builder()
                     .study(study)
                     .tableType(PostType.STUDY)
+                    .build();
+
+            reportRepository.save(report);
+
+            return createReportDetail(report, reason, customReason, currentUser);
+        }
+    }
+
+    // StudyPost 게시글 신고
+    public ReportDetail createStudyPostReport(Long studyPostId, ReportReason reason, String customReason, Authentication authentication) {
+        String userId = authentication.getName();
+        Member currentUser = memberService.find(userId);
+
+        StudyPost studyPost = studyPostRepository.findById(studyPostId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 post 게시글을 찾을 수 없습니다."));
+
+        if (studyPost.getMember() == currentUser) {
+            throw new IllegalArgumentException("내가 작성한 글은 신고할 수 없습니다.");
+        }
+
+        Report existingReport = isTargetPostAlreadyReported(studyPostId, studyPost.getType());
+
+        if (isUserAlreadyReported(existingReport, currentUser)) {
+            throw new IllegalArgumentException("이미 신고한 post 게시글입니다.");
+        }
+
+        // 신고 내역이 있는 경우 - 신고자 정보 추가
+        if (existingReport != null) {
+            return createReportDetail(existingReport, reason, customReason, currentUser);
+        } else {
+            // 신고 내역이 없는 경우 - 신고 내역에 추가, 신고자 정보 추가
+            Report report = Report.builder()
+                    .studyPost(studyPost)
+                    .tableType(studyPost.getType())
                     .build();
 
             reportRepository.save(report);
@@ -272,6 +310,9 @@ public class ReportService {
         else if (report.getTableType() == PostType.REPLY) {
             reporterMember = report.getReply().getMember();
         }
+        else if (report.getTableType() == PostType.STUDYPOST) {
+            reporterMember = report.getStudyPost().getMember();
+        }
         // TODO - 스터디에 게시글 작성자를 저장할 수 있어야 구현 가능
 /*        else if (report.getTableType() == PostType.STUDY) {
             reporterMember = report.getStudy().getMember();
@@ -312,6 +353,15 @@ public class ReportService {
                 replyRepository.deleteAll(replies);
             }
             studyRepository.deleteById(report.getStudy().getId());
+        }
+        else if (report.getTableType() == PostType.STUDYPOST) {
+            StudyPost studyPost = report.getStudyPost();
+            List<Reply> replies = replyService.findAllRepliesByStudyPostIdOrderByCreatedAtAsc(studyPost.getId());
+
+            if (replies != null) {
+                replyRepository.deleteAll(replies);
+            }
+            studyPostRepository.deleteById(report.getStudyPost().getId());
         }
 
     }

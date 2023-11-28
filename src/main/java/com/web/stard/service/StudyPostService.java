@@ -79,7 +79,7 @@ public class StudyPostService {
                                   MultipartFile file, Authentication authentication) {
         Study study = studyService.findById(studyId); // 스터디
         Member member = memberService.find(authentication.getName()); // 작성자
-        StudyPost studyPost = new StudyPost(study, member, title, content);
+        StudyPost studyPost = new StudyPost(study, member, title, content, PostType.STUDYPOST);
 
         if (file == null) {
             studyPostRepository.save(studyPost);

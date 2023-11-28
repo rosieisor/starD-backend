@@ -20,5 +20,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     /* study 게시글 아이디 별 댓글 전체 조회 (생성일 순) */
     List<Reply> findAllByStudyIdOrderByCreatedAtAsc(Long studyId);
 
+    /* studyPost 게시글 아이디 별 댓글 전체 조회 (생성일 순) */
+    List<Reply> findAllByStudyPostIdOrderByCreatedAtAsc(Long studyId);
+
     List<Reply> findAllByMember(Member member);
 }

@@ -31,9 +31,13 @@ public class Reply  extends BaseEntity {
     @JoinColumn(name = "study_id")
     private Study study;
 
+    @ManyToOne
+    @JoinColumn(name="study_post_id")
+    private StudyPost studyPost;
+
     @NotNull
     private String content;
 
     @Enumerated(EnumType.STRING)
-    private PostType type; // [COMM, QNA, STUDY]
+    private PostType type; // [COMM, QNA, STUDY, STUDYPOST]
 }
