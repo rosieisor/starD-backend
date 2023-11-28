@@ -79,9 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
             // 이메일 인증
             "/emails/verifications",
-            "/emails/verification-requests",
-
-            "/user/mypage/profile/image"
+            "/emails/verification-requests"
     };
 
     @Override

@@ -7,6 +7,7 @@ import com.web.stard.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -77,7 +78,8 @@ public class ProfileService {
         try {
             imgFile.transferTo(destinationFile);
 
-            profile.setImgUrl("profileImages/" + imageFileName);
+//            profile.setImgUrl("profileImages/" + imageFileName);
+            profile.setImgUrl(imageFileName);
             profile.setImgName(imgFile.getOriginalFilename());
             profile.setIntroduce(introduce);
 
@@ -143,10 +145,11 @@ public class ProfileService {
     // [R] 프로필 이미지 조회
     public ResponseEntity<Resource> getProfileImage(String imageUrl) throws IOException {
 
-        String path = uploadFolder + imageUrl.substring("profileImages/".length());
-        System.out.printf(path);
+//        String path = uploadFolder + imageUrl.substring("profileImages/".length());
+//        System.out.printf(path);
 
-        Resource resource = new ClassPathResource(path);
+        Resource resource = new FileSystemResource(uploadFolder + imageUrl);
+        System.out.printf(uploadFolder + imageUrl);
 
         // 리소스를 읽어오지 못했다면 404 에러 반환
         if (!resource.exists()) {
