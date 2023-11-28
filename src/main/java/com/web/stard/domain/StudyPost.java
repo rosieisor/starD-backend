@@ -37,6 +37,9 @@ public class StudyPost extends BaseEntity {
     @Column(name = "file_url")
     private String fileUrl; // 파일 경로
 
+    @Enumerated(EnumType.STRING)
+    private PostType type; // post 타입 [COMM, QNA, NOTICE, FAQ, STUDY, REPLY, STUDYPOST]
+
 
 
     @Transient // DB랑 매핑되지 않음
@@ -44,10 +47,11 @@ public class StudyPost extends BaseEntity {
 
 
 
-    public StudyPost(Study study, Member member, String title, String content) {
+    public StudyPost(Study study, Member member, String title, String content, PostType type) {
         this.study = study;
         this.member = member;
         this.title = title;
         this.content = content;
+        this.type = type;
     }
 }

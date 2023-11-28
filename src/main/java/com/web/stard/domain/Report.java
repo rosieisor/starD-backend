@@ -28,8 +28,12 @@ public class Report {
     @JoinColumn(name = "reply_id")
     private Reply reply;
 
+    @ManyToOne
+    @JoinColumn(name="study_post_id")
+    private StudyPost studyPost;
+
     @NotNull
     @Column(name = "table_type")
     @Enumerated(EnumType.STRING)
-    private PostType tableType;    // [COMM, QNA, STUDY, REPLY]
+    private PostType tableType;    // [COMM, QNA, STUDY, REPLY, STUDYPOST]
 }

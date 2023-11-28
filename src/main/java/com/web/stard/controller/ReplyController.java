@@ -54,6 +54,19 @@ public class ReplyController {
         return replyService.createStudyReply(targetIdLong, replyContent, authentication);
     }
 
+    // StudyPost 댓글 생성
+    @PostMapping("/studypost")
+    public Reply createStudyPostReply(@RequestBody Map<String, Object> requestPayload, Authentication authentication) {
+        String targetIdStr = (String) requestPayload.get("targetId");
+        Integer targetId = Integer.parseInt(targetIdStr);
+
+        String replyContent = (String) requestPayload.get("replyContent");
+
+        Long targetIdLong = targetId.longValue(); // Integer를 Long으로 변환
+
+        return replyService.createStudyPostReply(targetIdLong, replyContent, authentication);
+    }
+
     // 댓글 수정 (Post, Study 공통)
     @PostMapping("/{commentId}")
     public Reply updateReply(@PathVariable Long commentId, @RequestBody Map<String, String> requestMap, Authentication authentication) {
@@ -89,6 +102,12 @@ public class ReplyController {
     @GetMapping("/study/{targetId}")
     public List<Reply> findAllRepliesByStudyId(@PathVariable Long targetId) {
         return replyService.findAllRepliesByStudyIdOrderByCreatedAtAsc(targetId);
+    }
+
+    // studyPost 게시글 아이디 별 댓글 조회 (생성일 순)
+    @GetMapping("/studypost/{targetId}")
+    public List<Reply> findAllRepliesByStudyPostId(@PathVariable Long targetId) {
+        return replyService.findAllRepliesByStudyPostIdOrderByCreatedAtAsc(targetId);
     }
 
     // 댓글 작성하려는 게시글의 타입 조회
