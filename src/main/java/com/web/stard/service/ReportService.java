@@ -310,18 +310,18 @@ public class ReportService {
         else if (report.getTableType() == PostType.REPLY) {
             reporterMember = report.getReply().getMember();
         }
+        else if (report.getTableType() == PostType.STUDY) {
+            reporterMember = report.getStudy().getRecruiter();
+        }
         else if (report.getTableType() == PostType.STUDYPOST) {
             reporterMember = report.getStudyPost().getMember();
         }
-        // TODO - 스터디에 게시글 작성자를 저장할 수 있어야 구현 가능
-/*        else if (report.getTableType() == PostType.STUDY) {
-            reporterMember = report.getStudy().getMember();
-        }*/
 
         List<ReportDetail> reportDetails = reportDetailRepository.findByReportId(reportId);
 
         // 신고 승인된 글의 작성자에게 신고 부여
-        if (reportDetails.size() >= 5) {
+        // TODO 5로 변경하기
+        if (reportDetails.size() >= 1) {
             reporterMember.setReportCount(reporterMember.getReportCount() + 1);
         }
 
