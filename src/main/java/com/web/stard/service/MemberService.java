@@ -122,18 +122,32 @@ public class MemberService {
 
     /* 회원 탈퇴 */
     @Transactional
-    public ResponseEntity<String> deleteMember(String id, String password) {
+    public ResponseEntity<String> deleteMember(String id, String password, Authentication authentication) {
         Member member = find(id);
 
-        if (!checkPw(id, password)) { // 비밀번호 틀림
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 올바르지 않습니다.");
+        Role userRole = memberRepository.findById(authentication.getName()).get().getRoles();
+        boolean forceDelete = false;
+
+        // 강제 탈퇴인지 확인
+        if (userRole == Role.ADMIN && !id.equals(authentication.getName())) {
+            forceDelete = true;
+            if (member.getReportCount() < 1) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("누적 신고 수가 10회 미만이면 강제 탈퇴 처리가 불가능합니다.");
+            }
         }
 
-        // 스터디 진행(중단 포함) 중에는 자발적 탈퇴 불가능하게
-        List<ProgressStatus> statusList = Arrays.asList(ProgressStatus.IN_PROGRESS, ProgressStatus.DISCONTINUE);
-        List<StudyMember> studies = studyMemberRepository.findByMemberAndStudyProgressStatusIn(member, statusList);
-        if (studies.size() > 0) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("스터디 진행 중에는 탈퇴할 수 없습니다.");
+        // 강제 탈퇴 시 비밀번호 확인 및 스터디 진행 여부와 관계 없이 탈퇴 가능
+        if (!forceDelete) {
+            if (!checkPw(id, password)) { // 비밀번호 틀림
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 올바르지 않습니다.");
+            }
+
+            // 스터디 진행(중단 포함) 중에는 자발적 탈퇴 불가능하게
+            List<ProgressStatus> statusList = Arrays.asList(ProgressStatus.IN_PROGRESS, ProgressStatus.DISCONTINUE);
+            List<StudyMember> studies = studyMemberRepository.findByMemberAndStudyProgressStatusIn(member, statusList);
+            if (studies.size() > 0) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("스터디 진행 중에는 탈퇴할 수 없습니다.");
+            }
         }
 
         // recruiter + progressStatus가 null인 것들만 삭제 (진행으로 넘어가지 않은 모집 게시글만 삭제되게)
@@ -206,6 +220,8 @@ public class MemberService {
             studyPost.setMember(updateMember);
             studyPostRepository.save(studyPost);
         }
+
+        interestRepository.deleteAllByMember(member);
 
         memberRepository.delete(member);
 

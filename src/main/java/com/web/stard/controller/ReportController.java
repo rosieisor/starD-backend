@@ -4,10 +4,12 @@ import com.web.stard.domain.Member;
 import com.web.stard.domain.Report;
 import com.web.stard.domain.ReportDetail;
 import com.web.stard.domain.ReportReason;
+import com.web.stard.service.MemberService;
 import com.web.stard.service.ReportService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,7 @@ import java.util.Set;
 public class ReportController {
 
     private final ReportService reportService;
+    private final MemberService memberService;
 
     // string을 enum으로 변환
     public ReportReason reportReason(String reason) {
@@ -138,10 +141,11 @@ public class ReportController {
         return reportService.getMemberReports(authentication);
     }
 
-    @DeleteMapping("/members/{memberId}")
+    @PostMapping("/members/{memberId}")
     // 강제 탈퇴
-    public void forceDeleteMember(@PathVariable String memberId, Authentication authentication) {
-        reportService.forceDeleteMember(memberId, authentication);
+    public ResponseEntity<String> forceDeleteMember(@PathVariable String memberId, Authentication authentication) {
+//        reportService.forceDeleteMember(memberId, authentication);
+        return memberService.deleteMember(memberId, null, authentication);
     }
 
 }

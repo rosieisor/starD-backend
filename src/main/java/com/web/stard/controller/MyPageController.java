@@ -206,7 +206,7 @@ public class MyPageController {
     /* 회원 탈퇴 (아직 기능 X) */
     @PostMapping("/delete")
     public ResponseEntity<String> delete(@RequestParam("password") String password, Authentication authentication) {
-        return memberService.deleteMember(authentication.getName(), password);
+        return memberService.deleteMember(authentication.getName(), password, authentication);
     }
 
     // [U] 프로필 수정
