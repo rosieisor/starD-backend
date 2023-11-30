@@ -326,7 +326,6 @@ public class ReportService {
         }
 
         // 신고자 정보 삭제
-
         reportDetailRepository.deleteAll(reportDetails);
 
         // 신고 내역 삭제
@@ -383,37 +382,37 @@ public class ReportService {
     }
 
     // 강제 탈퇴
-    public void forceDeleteMember(String memberId, Authentication authentication) {
-        checkIfMemberIsAdmin(authentication);
-
-        Member member = memberService.find(memberId);
-
-        if (member.getReportCount() >= 10) {
-            // 해당 회원이 작성한 글, 댓글의 작성자는 '알 수 없음'으로 변경
-            Member removedMember = new Member();
-            removedMember.setId("알수없음");
-            removedMember.setNickname("알수없음");
-
-            List<Post> posts = postRepository.findAllByMember(member);
-            for (Post post : posts) {
-                post.setMember(removedMember);
-            }
-
-            // TODO - 스터디에 게시글 작성자를 저장할 수 있어야 구현 가능
-/*
-            List<Study> studies = studyRepository.findAllByMember(member);
-            for (Study study : studies) {
-                study.setMember(removedMember);
-            }
-*/
-
-            List<Reply> replies = replyRepository.findAllByMember(member);
-            for (Reply reply : replies) {
-                reply.setMember(removedMember);
-            }
-
-            memberRepository.delete(member);
-        }
-    }
+//    public void forceDeleteMember(String memberId, Authentication authentication) {
+//        checkIfMemberIsAdmin(authentication);
+//
+//        Member member = memberService.find(memberId);
+//
+//        if (member.getReportCount() >= 10) {
+//            // 해당 회원이 작성한 글, 댓글의 작성자는 '알 수 없음'으로 변경
+//            Member removedMember = new Member();
+//            removedMember.setId("알수없음");
+//            removedMember.setNickname("알수없음");
+//
+//            List<Post> posts = postRepository.findAllByMember(member);
+//            for (Post post : posts) {
+//                post.setMember(removedMember);
+//            }
+//
+//            // TODO - 스터디에 게시글 작성자를 저장할 수 있어야 구현 가능
+///*
+//            List<Study> studies = studyRepository.findAllByMember(member);
+//            for (Study study : studies) {
+//                study.setMember(removedMember);
+//            }
+//*/
+//
+//            List<Reply> replies = replyRepository.findAllByMember(member);
+//            for (Reply reply : replies) {
+//                reply.setMember(removedMember);
+//            }
+//
+//            memberRepository.delete(member);
+//        }
+//    }
 
 }
