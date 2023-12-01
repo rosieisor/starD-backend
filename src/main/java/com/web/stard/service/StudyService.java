@@ -364,7 +364,7 @@ public class StudyService {
                     .member(applicant.getMember())
                     .study(applicant.getStudy())
                     .replyAllow(true)
-                    .deleteAllow(true)
+                    .deleteAllow(false)
                     .recruiterAllow(true).build();
 
             studyMemberRepository.save(studyMember);
