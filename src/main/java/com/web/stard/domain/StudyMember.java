@@ -36,8 +36,5 @@ public class StudyMember {      // 스터디 참여자
 
     @Column(name = "recruiter_allow")
     private boolean recruiterAllow;
-    
-    @Column(name = "discontinue_allow")
-    private boolean discontinueAllow; // 중단 동의여부
 
 }

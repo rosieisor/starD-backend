@@ -390,8 +390,7 @@ public class StudyService {
                         .study(study)
                         .replyAllow(true)
                         .deleteAllow(true)
-                        .recruiterAllow(true)
-                        .discontinueAllow(false).build();
+                        .recruiterAllow(true).build();
 
                 studyMemberRepository.save(studyMember);
 
@@ -428,13 +427,13 @@ public class StudyService {
         Member member = memberService.find(authentication.getName());
 
         StudyMember studyMember = studyMemberRepository.findByStudyAndMember(study, member);
-        studyMember.setDiscontinueAllow(true);
+        studyMember.setDeleteAllow(true);
         studyMemberRepository.save(studyMember);
 
         // 모든 스터디원이 동의했는지 확인 -> 스터디 "중단"으로 변경
         List<StudyMember> studyMembers = findStudyMember(studyId, authentication);
 
-        if (studyMembers.stream().allMatch(StudyMember::isDiscontinueAllow)) {
+        if (studyMembers.stream().allMatch(StudyMember::isDeleteAllow)) {
             // 모두 동의한 경우 스터디 중단
             study.setProgressStatus(ProgressStatus.DISCONTINUE);
             studyRepository.save(study);
