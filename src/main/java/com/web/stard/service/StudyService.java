@@ -442,9 +442,11 @@ public class StudyService {
         List<StudyMember> studyMembers = findStudyMember(studyId, authentication);
 
         if (studyMembers.stream().allMatch(StudyMember::isDeleteAllow)) {
-            // 모두 동의한 경우 스터디 중단
-            study.setProgressStatus(ProgressStatus.DISCONTINUE);
-            studyRepository.save(study);
+            // 모두 동의한 경우 스터디 중단 (스터디 진행 현황이 진행 중인 경우에만)
+            if (study.getProgressStatus().equals(ProgressStatus.IN_PROGRESS)) {
+                study.setProgressStatus(ProgressStatus.DISCONTINUE);
+                studyRepository.save(study);
+            }
         }
         return true;
     }
