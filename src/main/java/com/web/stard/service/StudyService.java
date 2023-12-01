@@ -390,7 +390,8 @@ public class StudyService {
                         .study(study)
                         .replyAllow(true)
                         .deleteAllow(true)
-                        .recruiterAllow(true).build();
+                        .recruiterAllow(true)
+                        .discontinueAllow(false).build();
 
                 studyMemberRepository.save(studyMember);
 
@@ -418,6 +419,27 @@ public class StudyService {
 
     public List<Top5Dto> findStudyRanking() {
         return studyRepository.findTop5();
+    }
+
+    @Transactional
+    public Boolean studyDiscontinueAllow(Long studyId, Authentication authentication) throws Exception {
+        // 한 번 동의하면 취소 불가능?
+        Study study = findById(studyId);
+        Member member = memberService.find(authentication.getName());
+
+        StudyMember studyMember = studyMemberRepository.findByStudyAndMember(study, member);
+        studyMember.setDiscontinueAllow(true);
+        studyMemberRepository.save(studyMember);
+
+        // 모든 스터디원이 동의했는지 확인 -> 스터디 "중단"으로 변경
+        List<StudyMember> studyMembers = findStudyMember(studyId, authentication);
+
+        if (studyMembers.stream().allMatch(StudyMember::isDiscontinueAllow)) {
+            // 모두 동의한 경우 스터디 중단
+            study.setProgressStatus(ProgressStatus.DISCONTINUE);
+            studyRepository.save(study);
+        }
+        return true;
     }
 
     // 스터디 모집 마감일이 지나면 "모집 중" -> "모집 완료"로 상태 변경
