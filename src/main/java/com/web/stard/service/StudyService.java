@@ -420,6 +420,14 @@ public class StudyService {
         return studyRepository.findTop5();
     }
 
+    public Boolean findStudyDiscontinueAllow(Long studyId, Authentication authentication) {
+        Study study = findById(studyId);
+        Member member = memberService.find(authentication.getName());
+
+        StudyMember studyMember = studyMemberRepository.findByStudyAndMember(study, member);
+        return studyMember.isDeleteAllow();
+    }
+
     @Transactional
     public Boolean studyDiscontinueAllow(Long studyId, Authentication authentication) throws Exception {
         // 한 번 동의하면 취소 불가능?
