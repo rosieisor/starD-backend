@@ -364,7 +364,7 @@ public class StudyService {
                     .member(applicant.getMember())
                     .study(applicant.getStudy())
                     .replyAllow(true)
-                    .deleteAllow(true)
+                    .deleteAllow(false)
                     .recruiterAllow(true).build();
 
             studyMemberRepository.save(studyMember);
@@ -389,7 +389,7 @@ public class StudyService {
                         .member(member)
                         .study(study)
                         .replyAllow(true)
-                        .deleteAllow(true)
+                        .deleteAllow(false)
                         .recruiterAllow(true).build();
 
                 studyMemberRepository.save(studyMember);
@@ -418,6 +418,37 @@ public class StudyService {
 
     public List<Top5Dto> findStudyRanking() {
         return studyRepository.findTop5();
+    }
+
+    public Boolean findStudyDiscontinueAllow(Long studyId, Authentication authentication) {
+        Study study = findById(studyId);
+        Member member = memberService.find(authentication.getName());
+
+        StudyMember studyMember = studyMemberRepository.findByStudyAndMember(study, member);
+        return studyMember.isDeleteAllow();
+    }
+
+    @Transactional
+    public Boolean studyDiscontinueAllow(Long studyId, Authentication authentication) throws Exception {
+        // 한 번 동의하면 취소 불가능?
+        Study study = findById(studyId);
+        Member member = memberService.find(authentication.getName());
+
+        StudyMember studyMember = studyMemberRepository.findByStudyAndMember(study, member);
+        studyMember.setDeleteAllow(true);
+        studyMemberRepository.save(studyMember);
+
+        // 모든 스터디원이 동의했는지 확인 -> 스터디 "중단"으로 변경
+        List<StudyMember> studyMembers = findStudyMember(studyId, authentication);
+
+        if (studyMembers.stream().allMatch(StudyMember::isDeleteAllow)) {
+            // 모두 동의한 경우 스터디 중단 (스터디 진행 현황이 진행 중인 경우에만)
+            if (study.getProgressStatus().equals(ProgressStatus.IN_PROGRESS)) {
+                study.setProgressStatus(ProgressStatus.DISCONTINUE);
+                studyRepository.save(study);
+            }
+        }
+        return true;
     }
 
     // 스터디 모집 마감일이 지나면 "모집 중" -> "모집 완료"로 상태 변경

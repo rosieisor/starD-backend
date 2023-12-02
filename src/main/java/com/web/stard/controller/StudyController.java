@@ -215,6 +215,15 @@ public class StudyController {
         }
     }
 
+    @GetMapping("/discontinue/{studyId}") // 스터디 중단 동의 여부 (사용자 본인만)
+    public Boolean findStudyDiscontinueAllow(@PathVariable Long studyId, Authentication authentication) {
+        return studyService.findStudyDiscontinueAllow(studyId, authentication);
+    }
+
+    @PostMapping("/discontinue/{studyId}")  // 스터디 중단 동의
+    public Boolean studyDiscontinueAllow(@PathVariable Long studyId, Authentication authentication) throws Exception {
+        return studyService.studyDiscontinueAllow(studyId, authentication);
+    }
 
 
 }
