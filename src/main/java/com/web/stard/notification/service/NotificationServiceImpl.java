@@ -13,6 +13,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.Map;
 
+import static com.web.stard.notification.dto.SseMapStruct.SSE_MAP_STRUCT;
+
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
@@ -103,7 +105,7 @@ public class NotificationServiceImpl implements NotificationService {
         sseEmitters.forEach(
                 (key, emitter) -> {
                     emitterRepository.saveEventCache(key, notification);
-                    sendToClient(emitter, key, notification);
+                    sendToClient(emitter, key, SSE_MAP_STRUCT.toResponseNotification(notification));
                 }
         );
 

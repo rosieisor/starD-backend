@@ -24,4 +24,5 @@ public class ResponseNotificationDto {
         this.createdAt = String.valueOf((notification.getCreatedAt()));
     }
 
+
 }
