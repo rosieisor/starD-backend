@@ -247,5 +247,10 @@ public class StarScrapController {
         return starScrapService.deleteStudyPostStar(id, authentication);
     }
 
+    /* 특정 회원의 공감, 스크랩 내역 전체 삭제(탈퇴 시 사용) */
+    @DeleteMapping("/star/all/{id}")
+    public void deleteAllStarAndStudy(@PathVariable String id) {
+        starScrapService.deleteAllStarAndStudy(id);
+    }
 
 }

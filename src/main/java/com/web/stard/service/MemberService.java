@@ -37,7 +37,7 @@ public class MemberService {
     PostRepository postRepository;
     ReplyRepository replyRepository;
     StudyPostRepository studyPostRepository;
-
+    StarScrapRepository starScrapRepository;
 
     public Member find(String id) {
         Optional<Member> result = memberRepository.findById(id);
@@ -149,6 +149,9 @@ public class MemberService {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("스터디 진행 중에는 탈퇴할 수 없습니다.");
             }
         }
+
+        // 해당 회원의 공감, 스크랩 내역 삭제
+        starScrapRepository.deleteByMember(member);
 
         // recruiter + progressStatus가 null인 것들만 삭제 (진행으로 넘어가지 않은 모집 게시글만 삭제되게)
         List<Study> deleteStudies = studyRepository.findStudiesByRecruiterAndNullProgressStatus(member);

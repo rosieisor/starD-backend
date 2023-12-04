@@ -28,4 +28,12 @@ public interface StarScrapRepository extends JpaRepository<StarScrap, Long> {
 
     /* 해당 StudyPost의 공감 전체 조회 */
     List<StarScrap> findAllByStudyPostAndTypeAndTableType(StudyPost studyPost, ActType actType, PostType postType);
+
+    void deleteByMember(Member member);
+
+    void deleteByPostId(Long id);
+
+    void deleteByStudyId(Long id);
+
+    void deleteByStudyPostId(Long id);
 }
