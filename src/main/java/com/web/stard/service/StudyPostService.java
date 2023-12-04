@@ -112,45 +112,51 @@ public class StudyPostService {
     }
 
     /* 게시글 수정 */
-    public StudyPost updatePost(Long postId, String title, String content, MultipartFile file) {
+    public StudyPost updatePost(Long postId, String title, String content, MultipartFile file, Boolean fileUpdateStatus) {
         StudyPost studyPost = getStudyPost(postId, null);
 
         studyPost.setTitle(title);
         studyPost.setContent(content);
 
-        String originFileUrl = "";
-        if (studyPost.getFileUrl() != null) {
-            originFileUrl = studyPost.getFileUrl();
-        }
+        if (fileUpdateStatus) {
+            // 파일 수정된 경우
+            String originFileUrl = "";
+            if (studyPost.getFileUrl() != null) {
+                originFileUrl = studyPost.getFileUrl();
+            }
 
-        if (file == null) {
-            // 새로운 파일이 없는 경우
-            studyPost.setFileName(null);
-            studyPost.setFileUrl(null);
+            if (file == null) {
+                // 새로운 파일이 없는 경우
+                studyPost.setFileName(null);
+                studyPost.setFileUrl(null);
+            } else {
+                File folder = new File(uploadFolder + studyPost.getStudy().getId());
+
+                if (!folder.exists()) {
+                    folder.mkdirs(); // 디렉토리 생성
+                }
+
+                UUID uuid = UUID.randomUUID();
+                String fileName = uuid + "_" + file.getOriginalFilename();
+                File destinationFile = new File(uploadFolder + studyPost.getStudy().getId() + "/" + fileName);
+
+                try {
+                    file.transferTo(destinationFile);
+
+                    studyPost.setFileName(file.getOriginalFilename());
+                    studyPost.setFileUrl("/" + fileName);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                studyPostRepository.save(studyPost);
+
+                // 기존 파일 삭제
+                deleteFile(studyPost.getStudy().getId(), originFileUrl);
+            }
         } else {
-            File folder = new File(uploadFolder + studyPost.getStudy().getId());
-
-            if (!folder.exists()) {
-                folder.mkdirs(); // 디렉토리 생성
-            }
-
-            UUID uuid = UUID.randomUUID();
-            String fileName = uuid + "_" + file.getOriginalFilename();
-            File destinationFile = new File(uploadFolder + studyPost.getStudy().getId() + "/" + fileName);
-
-            try {
-                file.transferTo(destinationFile);
-
-                studyPost.setFileName(file.getOriginalFilename());
-                studyPost.setFileUrl("/" + fileName);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            studyPostRepository.save(studyPost);
         }
-        studyPostRepository.save(studyPost);
-
-        // 기존 파일 삭제
-        deleteFile(studyPost.getStudy().getId(), originFileUrl);
 
         return studyPost;
     }
