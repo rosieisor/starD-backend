@@ -32,6 +32,7 @@ public class ReportService {
     private ReplyService replyService;
     private MemberRepository memberRepository;
     private StudyPostRepository studyPostRepository;
+    private StarScrapService starScrapService;
 
     // 해당 글이 이미 신고되었는지 확인
     private Report isTargetPostAlreadyReported(Long targetId, PostType postType) {
@@ -339,6 +340,7 @@ public class ReportService {
             if (replies != null) {
                 replyRepository.deleteAll(replies);
             }
+            starScrapService.deleteByPostId(post.getId());
             postRepository.deleteById(report.getPost().getId());
         }
         else if (report.getTableType() == PostType.REPLY) {
@@ -351,6 +353,7 @@ public class ReportService {
             if (replies != null) {
                 replyRepository.deleteAll(replies);
             }
+            starScrapService.deleteByStudyId(study.getId());
             studyRepository.deleteById(report.getStudy().getId());
         }
         else if (report.getTableType() == PostType.STUDYPOST) {
@@ -360,6 +363,7 @@ public class ReportService {
             if (replies != null) {
                 replyRepository.deleteAll(replies);
             }
+            starScrapService.deleteByStudyPostId(studyPost.getId());
             studyPostRepository.deleteById(report.getStudyPost().getId());
         }
 

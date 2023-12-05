@@ -98,10 +98,12 @@ public class ReplyService {
         String userId = authentication.getName();
         Member replier = memberService.find(userId);
         StudyPost targetStudyPost = studyPostService.getStudyPost(studyPostId, null);
+        Study targetStudy = studyService.findById(targetStudyPost.getStudy().getId());
 
         Reply reply = Reply.builder()
                 .member(replier)
                 .studyPost(targetStudyPost)
+                .study(targetStudy)
                 .content(replyContent)
                 .type(PostType.STUDYPOST)
                 .build();

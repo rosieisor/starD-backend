@@ -661,4 +661,24 @@ public class StarScrapService {
             return true;
         } return false;
     }
+
+
+    // 특정 회원의 공감, 스크랩 내역 전체 삭제
+    public void deleteAllStarAndStudy(String id) {
+        Member member = memberService.find(id);
+        starScrapRepository.deleteByMember(member);
+    }
+
+    // 게시글 아이디로 공감, 스크랩 내역 삭제하기
+    public void deleteByPostId(Long id) {
+        starScrapRepository.deleteByPostId(id);
+    }
+
+    public void deleteByStudyId(Long id) {
+        starScrapRepository.deleteByStudyId(id);
+    }
+
+    public void deleteByStudyPostId(Long id) {
+        starScrapRepository.deleteByStudyPostId(id);
+    }
 }
