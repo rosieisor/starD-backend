@@ -148,12 +148,11 @@ public class StudyPostService {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
-                studyPostRepository.save(studyPost);
-
-                // 기존 파일 삭제
-                deleteFile(studyPost.getStudy().getId(), originFileUrl);
             }
+            studyPostRepository.save(studyPost);
+
+            // 기존 파일 삭제
+            deleteFile(studyPost.getStudy().getId(), originFileUrl);
         } else {
             studyPostRepository.save(studyPost);
         }
