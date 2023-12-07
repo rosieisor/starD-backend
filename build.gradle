@@ -69,6 +69,10 @@ dependencies {
 	implementation 'javax.mail:javax.mail-api:1.6.2'
 	implementation 'org.apache.commons:commons-email:1.5'
 
+	// MapsStruct
+	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+
 }
 
 tasks.named('test') {
