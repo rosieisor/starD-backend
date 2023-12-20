@@ -127,4 +127,22 @@ public class NoticeService {
         return postRepository.findById(id);
     }
 
+    // 전체 검색
+    public List<Post> searchNoticePost(String searchType, String searchWord) {
+        List<Post> posts = null;
+
+        if (searchType.equals("제목")) {
+            posts = postRepository.findByTypeAndTitleContainingOrderByCreatedAtDesc(PostType.NOTICE, searchWord);
+        } else if (searchType.equals("내용")) {
+            posts = postRepository.findByTypeAndContentContainingOrderByCreatedAtDesc(PostType.NOTICE, searchWord);
+        }
+
+        for (Post p : posts) { // 스크랩 수, 공감 수
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.NOTICE);
+
+            p.setStarCount(allStarList.size());
+        }
+
+        return posts;
+    }
 }
