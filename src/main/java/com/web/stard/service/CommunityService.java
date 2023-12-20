@@ -64,18 +64,26 @@ public class CommunityService {
         return posts;
     }
 
+    public Post findById(Long id) {
+        Optional<Post> result = postRepository.findByIdAndType(id, PostType.COMM);
+        if (result.isPresent()) {
+            Post post = result.get();
+
+            return post;
+        }
+        return null;
+    }
+
     /* 커뮤니티 게시글 세부 조회 */
     public Post getCommunityPost(Long id, String userId) {
         Optional<Post> result = postRepository.findByIdAndType(id, PostType.COMM);
         if (result.isPresent()) {
             Post post = result.get();
 
-            if (userId != null) {
-                if (!post.getMember().getId().equals(userId)) {
-                    // 작성자 != 현재 로그인 한 유저
-                    post.setViewCount(post.getViewCount()+1);
-                    postRepository.save(post);
-                }
+            if (!post.getMember().getId().equals(userId)) {
+                // 작성자 != 현재 로그인 한 유저
+                post.setViewCount(post.getViewCount()+1);
+                postRepository.save(post);
             }
 
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(post, ActType.STAR, PostType.COMM);
@@ -218,7 +226,7 @@ public class CommunityService {
     /* 커뮤니티 게시글 수정 */
     public Post updateCommPost(Long id, CommPostRequestDto requestPost, Authentication authentication) {
         Member member = memberService.find(authentication.getName());
-        Post post = getCommunityPost(id, null);
+        Post post = findById(id);
 
         if (!member.getId().equals(post.getMember().getId())) {
             // 작성자랑 사용자가 다르면
@@ -237,7 +245,7 @@ public class CommunityService {
     /* 커뮤니티 게시글 삭제 */
     public boolean deleteCommPost(Long id, Authentication authentication) {
         Member member = memberService.find(authentication.getName());
-        Post post = getCommunityPost(id, null);
+        Post post = findById(id);
 
         if (!member.getId().equals(post.getMember().getId())) {
             // 작성자랑 사용자가 다르면
@@ -246,7 +254,7 @@ public class CommunityService {
 
         postRepository.delete(post);
 
-        if (getCommunityPost(id, null) == null) { // 삭제됨
+        if (findById(id) == null) { // 삭제됨
             return true;
         } return false;
     }

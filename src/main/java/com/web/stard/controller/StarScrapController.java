@@ -35,7 +35,7 @@ public class StarScrapController {
     @GetMapping("/star/post/{id}")
     public Boolean getPostStar(@PathVariable Long id, Authentication authentication) {
         Member member = memberService.find(authentication.getName());
-        Post post = communityService.getCommunityPost(id, null);
+        Post post = communityService.findById(id);
         StarScrap starScrap = starScrapService.existsCommStar(member, post);
         if (starScrap == null) {
             return false;
@@ -121,7 +121,7 @@ public class StarScrapController {
     @GetMapping("/scrap/post/{id}")
     public Boolean getPostScrap(@PathVariable Long id, Authentication authentication) {
         Member member = memberService.find(authentication.getName());
-        Post post = communityService.getCommunityPost(id, null);
+        Post post = communityService.findById(id);
         StarScrap starScrap = starScrapService.existsCommScrap(member, post);
         if (starScrap == null) {
             return false;
