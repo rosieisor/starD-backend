@@ -78,16 +78,10 @@ public class NoticeController {
         return noticeService.findTypeById(id, authentication);
     }
 
-    /*// 전체 검색
+    // 전체 검색
     @GetMapping("/search")
-    public List<Post> searchCommPost(@RequestParam String type, @RequestParam String word) {
-        return noticeService.searchNoticeAndFaq(type, word);
+    public List<Post> searchCommPost(@RequestParam String searchType, @RequestParam String searchWord) {
+        return noticeService.searchNoticePost(searchType, searchWord);
     }
 
-    // notice 검색
-    @GetMapping("/search/category")
-    public List<Post> searchByCategory(@RequestParam String type, @RequestParam String category,
-                                               @RequestParam String word) {
-        return noticeService.searchPostByCategory(type, category, word);
-    }*/
 }
