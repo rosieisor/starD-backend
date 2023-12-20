@@ -1,6 +1,8 @@
 package com.web.stard.controller;
 
+import com.web.stard.domain.Role;
 import com.web.stard.domain.StudyPost;
+import com.web.stard.service.MemberService;
 import com.web.stard.service.StudyPostService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +23,7 @@ import java.util.List;
 public class StudyPostController {
 
     private final StudyPostService studyPostService;
+    private final MemberService memberService;
 
 
     /* 게시글 전체 조회 */
@@ -36,7 +39,10 @@ public class StudyPostController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             if (!authentication.getName().equals("anonymousUser")) {
-                userId = authentication.getName(); // 사용자 아이디
+                Role userRole = memberService.find(authentication.getName()).getRoles();
+                if (userRole != Role.ADMIN) { // 관리자가 아닐 때
+                    userId = authentication.getName(); // 사용자 아이디
+                }
             }
         }
         return studyPostService.getStudyPost(postId, userId);
