@@ -68,4 +68,17 @@ public class QnaController {
     public List<Post> findAllFaqAndQna() {
         return qnaService.getAllFaqsAndQnas();
     }
+
+    // 전체 검색
+    @GetMapping("/search")
+    public List<Post> searchCommPost(@RequestParam String searchType, @RequestParam String searchWord) {
+        return qnaService.searchQnaAndFaq(searchType, searchWord);
+    }
+
+    // 카테고리 - 전체 검색
+    @GetMapping("/search/category")
+    public List<Post> searchCommPostByCategory(@RequestParam String searchType, @RequestParam String category,
+                                               @RequestParam String searchWord) {
+        return qnaService.searchQnaOrFaqByCategory(searchType, category, searchWord);
+    }
 }

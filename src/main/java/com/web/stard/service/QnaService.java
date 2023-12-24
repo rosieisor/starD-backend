@@ -123,4 +123,75 @@ public class QnaService {
 
         return allFaqsAndQnas;
     }
+
+    // 전체 검색
+    public List<Post> searchQnaAndFaq(String searchType, String searchWord) {
+        List<Post> posts;
+
+        if (searchType.equals("제목")) {
+            posts = postRepository.findByTypeAndTitleContainingOrderByCreatedAtDesc(PostType.QNA, searchWord);
+        } else if (searchType.equals("내용")) {
+            posts = postRepository.findByTypeAndContentContainingOrderByCreatedAtDesc(PostType.QNA, searchWord);
+        } else {
+            Member member = memberService.findByNickname(searchWord);
+            if (member == null) {
+                return null;
+            }
+            posts = postRepository.findByTypeAndMemberOrderByCreatedAtDesc(PostType.QNA, member);
+        }
+
+        for (Post p : posts) { // 스크랩 수, 공감 수
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.COMM);
+
+            p.setStarCount(allStarList.size());
+        }
+
+        return posts;
+    }
+
+    // 카테고리별 검색
+    public List<Post> searchQnaOrFaqByCategory(String searchType, String category, String searchWord) {
+        List<Post> posts;
+
+        PostType postType = null;
+
+        if (category.equals("FAQ")) {
+            postType = PostType.FAQ;
+        }
+        else if (category.equals("QNA")) {
+            postType = PostType.QNA;
+        }
+
+        if (searchType.equals("제목")) {
+            posts = postRepository.findByTypeAndTitleContainingOrderByCreatedAtDesc(postType, searchWord);
+        } else if (searchType.equals("내용")) {
+            posts = postRepository.findByTypeAndContentContainingOrderByCreatedAtDesc(postType, searchWord);
+        } else {
+            // faq에서 '관리자' 검색 시 faq 전체 리스트 가져오면 됨
+            if (postType == PostType.FAQ) {
+                if (searchWord.equals("관리자")) {
+                    posts = postRepository.findByTypeOrderByCreatedAtDesc(PostType.FAQ);
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                Member member = memberService.findByNickname(searchWord);
+                if (member == null) {
+                    return null;
+                }
+                posts = postRepository.findByTypeAndMemberOrderByCreatedAtDesc(postType, member);
+            }
+        }
+
+        for (Post p : posts) { // 스크랩 수, 공감 수
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, postType);
+
+            p.setStarCount(allStarList.size());
+        }
+
+        return posts;
+    }
+
 }
