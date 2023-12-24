@@ -124,32 +124,52 @@ public class QnaService {
         return allFaqsAndQnas;
     }
 
-    // 전체 검색
+    // 전체 검색 (전체, 제목/내용/작성자)
     public List<Post> searchQnaAndFaq(String searchType, String searchWord) {
-        List<Post> posts;
+        List<Post> qnas = new ArrayList<>();
+        List<Post> faqs = new ArrayList<>();
 
         if (searchType.equals("제목")) {
-            posts = postRepository.findByTypeAndTitleContainingOrderByCreatedAtDesc(PostType.QNA, searchWord);
+            faqs = postRepository.findByTypeAndTitleContainingOrderByCreatedAtDesc(PostType.FAQ, searchWord);
+            qnas = postRepository.findByTypeAndTitleContainingOrderByCreatedAtDesc(PostType.QNA, searchWord);
         } else if (searchType.equals("내용")) {
-            posts = postRepository.findByTypeAndContentContainingOrderByCreatedAtDesc(PostType.QNA, searchWord);
-        } else {
-            Member member = memberService.findByNickname(searchWord);
-            if (member == null) {
-                return null;
+            faqs = postRepository.findByTypeAndContentContainingOrderByCreatedAtDesc(PostType.FAQ, searchWord);
+            qnas = postRepository.findByTypeAndContentContainingOrderByCreatedAtDesc(PostType.QNA, searchWord);
+        } else {    // 작성자
+            if (searchWord.equals("관리자")) {
+                faqs = postRepository.findByTypeOrderByCreatedAtDesc(PostType.FAQ);
             }
-            posts = postRepository.findByTypeAndMemberOrderByCreatedAtDesc(PostType.QNA, member);
+            else {
+                Member member = memberService.findByNickname(searchWord);
+                if (member == null) {
+                    return null;
+                }
+                qnas = postRepository.findByTypeAndMemberOrderByCreatedAtDesc(PostType.QNA, member);
+            }
         }
 
-        for (Post p : posts) { // 스크랩 수, 공감 수
-            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.COMM);
+        // 공감 수
+        for (Post p : faqs) {
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.FAQ);
 
             p.setStarCount(allStarList.size());
         }
 
+        for (Post p : qnas) {
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.QNA);
+
+            p.setStarCount(allStarList.size());
+        }
+
+        // faq -> qna 순 합치기
+        List<Post> posts = new ArrayList<>();
+        posts.addAll(faqs);
+        posts.addAll(qnas);
+
         return posts;
     }
 
-    // 카테고리별 검색
+    // 카테고리별 검색 (qna/faq, 제목/내용/작성자)
     public List<Post> searchQnaOrFaqByCategory(String searchType, String category, String searchWord) {
         List<Post> posts;
 
