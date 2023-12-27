@@ -44,25 +44,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             }
         }
 
-//        try {
-//            // 2. validateToken 으로 토큰 유효성 검사
-//            if (token != null && jwtTokenProvider.validateToken(token)) {
-//                // (추가) Redis 에 해당 accessToken logout 여부 확인
-//                String isLogout = (String)redisTemplate.opsForValue().get(token);
-//                if (ObjectUtils.isEmpty(isLogout)) {
-//                    // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext 에 저장
-//                    Authentication authentication = jwtTokenProvider.getAuthentication(token);
-//                    SecurityContextHolder.getContext().setAuthentication(authentication);
-//                }
-//            }
-//        } catch (ExpiredJwtException expiredJwtException) {
-//            System.out.println("ExpiredJwtException 발생");
-//            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-//            if (redisTemplate.opsForValue().get("RT:" + authentication.getName()) != null) {
-//                redisTemplate.delete("RT:" + authentication.getName());
-//            }
-//        }
-
         chain.doFilter(request, response);
     }
 
