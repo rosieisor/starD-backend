@@ -1,5 +1,7 @@
 package com.web.stard.service;
 
+import com.web.stard.chat_stomp.ChatMessage;
+import com.web.stard.chat_stomp.ChatMessageRepository;
 import com.web.stard.domain.*;
 import com.web.stard.repository.*;
 import lombok.AllArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,14 @@ public class ReportService {
     private MemberRepository memberRepository;
     private StudyPostRepository studyPostRepository;
     private StarScrapService starScrapService;
+    private InterestRepository interestRepository;
+    private StudyMemberRepository studyMemberRepository;
+    private ProfileRepository profileRepository;
+    private ApplicantRepository applicantRepository;
+    private AssigneeRepository assigneeRepository;
+    private ChatMessageRepository chatMessageRepository;
+    private EvaluationRepository evaluationRepository;
+    private StarScrapRepository starScrapRepository;
 
     // 해당 글이 이미 신고되었는지 확인
     private Report isTargetPostAlreadyReported(Long targetId, PostType postType) {
@@ -385,38 +396,95 @@ public class ReportService {
         return resultList;
     }
 
-    // 강제 탈퇴
-//    public void forceDeleteMember(String memberId, Authentication authentication) {
-//        checkIfMemberIsAdmin(authentication);
-//
-//        Member member = memberService.find(memberId);
-//
-//        if (member.getReportCount() >= 10) {
-//            // 해당 회원이 작성한 글, 댓글의 작성자는 '알 수 없음'으로 변경
-//            Member removedMember = new Member();
-//            removedMember.setId("알수없음");
-//            removedMember.setNickname("알수없음");
-//
-//            List<Post> posts = postRepository.findAllByMember(member);
-//            for (Post post : posts) {
-//                post.setMember(removedMember);
-//            }
-//
-//            // TODO - 스터디에 게시글 작성자를 저장할 수 있어야 구현 가능
-///*
-//            List<Study> studies = studyRepository.findAllByMember(member);
-//            for (Study study : studies) {
-//                study.setMember(removedMember);
-//            }
-//*/
-//
-//            List<Reply> replies = replyRepository.findAllByMember(member);
-//            for (Reply reply : replies) {
-//                reply.setMember(removedMember);
-//            }
-//
-//            memberRepository.delete(member);
-//        }
-//    }
+    // 강제 탈퇴 - 스케줄러
+    @Transactional
+    public void forceDeleteMember() {
+        List<Member> members = memberRepository.findAll();
+
+        for (Member member : members) {
+            if (member.getReportCount() >= 10) {
+                // 해당 회원의 공감, 스크랩 내역 삭제
+                starScrapRepository.deleteByMember(member);
+
+                // recruiter + progressStatus가 null인 것들만 삭제 (진행으로 넘어가지 않은 모집 게시글만 삭제되게)
+                List<Study> deleteStudies = studyRepository.findStudiesByRecruiterAndNullProgressStatus(member);
+                studyRepository.deleteAll(deleteStudies);
+
+                // '알 수 없음' 변경
+                Member updateMember = memberService.find("admin2");
+
+                List<Applicant> updateApplicant = applicantRepository.findByMemberAndStudyProgressStatusIsNotNull(member);
+                for (Applicant applicant : updateApplicant) {
+                    applicant.setMember(updateMember);
+                    applicantRepository.save(applicant);
+                }
+
+                List<Assignee> updateAssignee = assigneeRepository.findAllByMember(member);
+                for (Assignee assignee : updateAssignee) {
+                    Assignee newAssignee = new Assignee();
+                    newAssignee.setToDo(assignee.getToDo());
+                    newAssignee.setMember(updateMember);
+                    newAssignee.setToDoStatus(assignee.isToDoStatus());
+
+                    assigneeRepository.delete(assignee);
+                    assigneeRepository.save(newAssignee);
+                }
+
+                List<ChatMessage> updateChatMessage = chatMessageRepository.findByMember(member);
+                for (ChatMessage chatMessage : updateChatMessage) {
+                    chatMessage.setMember(updateMember);
+                    chatMessageRepository.save(chatMessage);
+                }
+
+                List<Evaluation> updateEvaluation = evaluationRepository.findByTargetOrderByStudyActivityDeadlineDesc(member); // 내가 target
+                List<Evaluation> updateEvaluation2 = evaluationRepository.findByMemberOrderByStudyActivityDeadlineDesc(member); // 내가 member
+                for (Evaluation evaluation : updateEvaluation) {
+                    evaluation.setTarget(updateMember);
+                    evaluationRepository.save(evaluation);
+                }
+                for (Evaluation evaluation : updateEvaluation2) {
+                    evaluation.setMember(updateMember);
+                    evaluationRepository.save(evaluation);
+                }
+
+                List<Post> updatePost = postRepository.findAllByMember(member);
+                for (Post post : updatePost) {
+                    post.setMember(updateMember);
+                    postRepository.save(post);
+                }
+
+                List<Reply> updateReply = replyRepository.findAllByMember(member);
+                for (Reply reply : updateReply) {
+                    reply.setMember(updateMember);
+                    replyRepository.save(reply);
+                }
+
+                List<Study> updateStudy = studyRepository.findByRecruiterAndProgressStatus(member, ProgressStatus.WRAP_UP);
+                for (Study study : updateStudy) {
+                    study.setRecruiter(updateMember);
+                    studyRepository.save(study);
+                }
+
+                List<StudyMember> updateStudyMember = studyMemberRepository.findByMemberAndStudyProgressStatusOrderByIdDesc(member, ProgressStatus.WRAP_UP);
+                for (StudyMember studyMember : updateStudyMember) {
+                    studyMember.setMember(updateMember);
+                    studyMemberRepository.save(studyMember);
+                }
+
+                List<StudyPost> updateStudyPost = studyPostRepository.findByMemberAndStudyProgressStatus(member, ProgressStatus.WRAP_UP);
+                for (StudyPost studyPost : updateStudyPost) {
+                    studyPost.setMember(updateMember);
+                    studyPostRepository.save(studyPost);
+                }
+
+                interestRepository.deleteAllByMember(member);
+
+                memberRepository.delete(member);
+
+                // 프로필 삭제
+                profileRepository.deleteById(member.getProfile().getId());
+            }
+        }
+    }
 
 }
