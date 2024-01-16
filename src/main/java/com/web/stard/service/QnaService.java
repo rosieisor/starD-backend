@@ -7,9 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +39,7 @@ public class QnaService {
     }
 
     // qna 리스트 조회 (비회원은 리스트 조회 가능)
-    public List<Post> getAllQna(int page) {
+    public Page<Post> getAllQna(int page) {
 
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page-1, 10, sort);
@@ -103,26 +101,34 @@ public class QnaService {
         });
     }
 
+    // TODO 1페이지에서 데이터 모두 읽어오는 오류 수정 필요
     // faq, qna 순 최신 순 리스트 보기
-    public List<Post> getAllFaqsAndQnas() {
-        List<Post> faqs = postRepository.findByTypeOrderByCreatedAtDesc(PostType.FAQ);
+    public Page<Post> getAllFaqsAndQnas(int page) {
+        Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page - 1, 10, sort);
+
+        Page<Post> faqs = postRepository.findByTypeOrderByCreatedAtDesc(PostType.FAQ, pageable);
         for (Post p : faqs) { // 공감 수
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.FAQ);
             p.setStarCount(allStarList.size());
         }
 
-        List<Post> qnas = postRepository.findByTypeOrderByCreatedAtDesc(PostType.QNA);
+        Page<Post> qnas = postRepository.findByTypeOrderByCreatedAtDesc(PostType.QNA, pageable);
         for (Post p : qnas) { // 공감 수
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.QNA);
             p.setStarCount(allStarList.size());
         }
 
         List<Post> allFaqsAndQnas = new ArrayList<>();
-        allFaqsAndQnas.addAll(faqs);
-        allFaqsAndQnas.addAll(qnas);
+        allFaqsAndQnas.addAll(faqs.getContent());
+        allFaqsAndQnas.addAll(qnas.getContent());
 
-        return allFaqsAndQnas;
+        // 전체 데이터의 개수를 정확히 계산
+        long totalElements = faqs.getTotalElements() + qnas.getTotalElements();
+
+        return new PageImpl<>(allFaqsAndQnas, pageable, totalElements);
     }
+
 
     // 전체 검색 (전체, 제목/내용/작성자)
     public List<Post> searchQnaAndFaq(String searchType, String searchWord) {

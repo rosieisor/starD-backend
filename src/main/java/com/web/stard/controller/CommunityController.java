@@ -7,6 +7,7 @@ import com.web.stard.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -23,16 +24,16 @@ public class CommunityController {
     private final CommunityService comService;
 
     /* 커뮤니티 게시글 조회 (페이지화 X) */
-    @GetMapping
-    public List<Post> getAllCommunityPost() {
-        return comService.getAllCommunityPost(); // 페이지화 X (그냥 전체 조회)
-    }
-
-//    /* 커뮤니티 게시글 조회 (페이지화 추가) */
 //    @GetMapping
-//    public List<Post> getAllCommunityPost(@RequestParam("page") int page) {
-//        return comService.getAllCommunityPost(page);
+//    public List<Post> getAllCommunityPost() {
+//        return comService.getAllCommunityPost(); // 페이지화 X (그냥 전체 조회)
 //    }
+
+    /* 커뮤니티 게시글 조회 (페이지화 추가) */
+    @GetMapping
+    public Page<Post> getAllCommunityPost(@RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+        return comService.getAllCommunityPost(page);
+    }
 
     /* 커뮤니티 게시글 세부 조회 */
     @GetMapping("/{id}")

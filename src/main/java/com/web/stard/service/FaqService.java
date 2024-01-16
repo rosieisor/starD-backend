@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,8 +39,8 @@ public class FaqService {
         return postRepository.save(post);
     }
 
-    // faq 리스트 조회
-    public List<Post> getAllFaq(int page) {
+    // faq 리스트 조회(페이지화o)
+    public Page<Post> getAllFaq(int page) {
 
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page-1, 10, sort);
