@@ -52,4 +52,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByTypeAndCategoryAndContentContaining(PostType type, String category, String searchWord, Pageable pageable);
     /* 카테고리 - 작성자 검색 (최근 순 + 페이징) */
     List<Post> findByTypeAndCategoryAndMember(PostType type, String category, Member member, Pageable pageable);
+
+    List<Post> findByTypeInOrderByCreatedAtDesc(List<PostType> faqAndQnaTypes);
 }
