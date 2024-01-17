@@ -67,14 +67,7 @@ public class QnaController {
     // faq, qna 최신 순 전체 보기
     @GetMapping("/all")
     public Page<Post> findAllFaqAndQna(@RequestParam(value = "page", defaultValue = "1", required = false) int page) {
-        Page<Post> result = qnaService.getAllFaqsAndQnas(page);
-
-        System.out.println("Fetched page: " + result.getNumber());
-        System.out.println("Total pages: " + result.getTotalPages());
-        System.out.println("Total elements: " + result.getTotalElements());
-        System.out.println("Number of elements in current page: " + result.getNumberOfElements());
-
-        return result;
+        return qnaService.getAllFaqsAndQnas(page);
     }
 
     // 전체 검색
