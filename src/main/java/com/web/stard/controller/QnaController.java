@@ -6,6 +6,7 @@ import com.web.stard.service.QnaService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +31,9 @@ public class QnaController {
         return post;
     }
 
-    // qna 리스트 조회
+    // qna 리스트 조회(페이지화o)
     @GetMapping
-    public List<Post> getAllQna(@RequestParam("page") int page) {
+    public Page<Post> getAllQna(@RequestParam(value = "page", defaultValue = "1", required = false) int page) {
         return qnaService.getAllQna(page);
     }
 
@@ -65,8 +66,8 @@ public class QnaController {
 
     // faq, qna 최신 순 전체 보기
     @GetMapping("/all")
-    public List<Post> findAllFaqAndQna() {
-        return qnaService.getAllFaqsAndQnas();
+    public Page<Post> findAllFaqAndQna(@RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+        return qnaService.getAllFaqsAndQnas(page);
     }
 
     // 전체 검색

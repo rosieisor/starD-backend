@@ -6,6 +6,7 @@ import com.web.stard.service.NoticeService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -32,19 +33,17 @@ public class NoticeController {
         return post;
     }
 
-    // Notice 리스트 조회
-    @GetMapping
-    public List<Post> getAllNotice() {
-        return noticeService.getAllNotice();
-    }
+    // Notice 리스트 조회 - 페이지화x
+//    @GetMapping
+//    public List<Post> getAllNotice() {
+//        return noticeService.getAllNotice();
+//    }
 
-    // 페이지화
-/*
-    public List<Post> getAllNotice(@RequestParam("page") int page) {
+    // Notice 리스트 조회 - 페이지화o
+    @GetMapping
+    public Page<Post> getAllNotice(@RequestParam(value = "page", defaultValue = "1", required = false) int page) {
         return noticeService.getAllNotice(page);
     }
-*/
-
 
     // Notice 상세 조회
     @GetMapping("/{id}")
