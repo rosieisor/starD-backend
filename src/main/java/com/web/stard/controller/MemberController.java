@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -46,7 +47,7 @@ public class MemberController {
 
     // [R] 아이디 찾기
     @GetMapping("/member/find-id")
-    private Member findId(@RequestParam(value = "email") String email, @RequestParam(value = "phone") String phone) {
+    private List<Member> findId(@RequestParam(value = "email") String email, @RequestParam(value = "phone") String phone) {
         return memberService.findId(email, phone);
     }
 

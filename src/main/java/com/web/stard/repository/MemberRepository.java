@@ -4,6 +4,7 @@ import com.web.stard.domain.Member;
 import com.web.stard.domain.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
@@ -19,5 +20,5 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
     Member findByNickname(String nickname);
 
-    Member findByEmailAndPhone(String email, String phone);
+    List<Member> findByEmailAndPhone(String email, String phone);
 }
