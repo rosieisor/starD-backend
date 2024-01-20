@@ -33,8 +33,8 @@ public class StudyController {
 
 
     @GetMapping("/{id}")    // [R] 스터디 게시글 세부 조회
-    public Study getStudy(@PathVariable Long id){
-        return studyService.findById(id);
+    public Study getStudy(Authentication authentication, @PathVariable Long id){
+        return studyService.getStudyDetail(authentication, id);
     }
 
     // [R] 키워드로 스터디 게시글 검색 ( 모집 중, 모집 완료 순으로 )

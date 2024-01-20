@@ -238,7 +238,7 @@ public class MemberService {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("탈퇴 실패");
     }
 
-    public Member findId(String email, String phone) {
+    public List<Member> findId(String email, String phone) {
         return memberRepository.findByEmailAndPhone(email, phone);
     }
 

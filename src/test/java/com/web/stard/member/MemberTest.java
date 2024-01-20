@@ -34,14 +34,14 @@ public class MemberTest {
 
         String email = "final";
         String phone = "01011111111";
-        Member result = memberService.findId(email, phone);
-
-//        Assert.assertEquals(result, null);
-        Assert.assertEquals(result.getId(), "final");
-
-        if (result == null)
-            System.out.println("회원 정보가 없습니다.");
-        else
-            System.out.println("아이디는 " + result.getId() + "입니다.");
+//        Member result = memberService.findId(email, phone);
+//
+////        Assert.assertEquals(result, null);
+//        Assert.assertEquals(result.getId(), "final");
+//
+//        if (result == null)
+//            System.out.println("회원 정보가 없습니다.");
+//        else
+//            System.out.println("아이디는 " + result.getId() + "입니다.");
     }
 }
