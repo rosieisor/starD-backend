@@ -3,6 +3,7 @@ package com.web.stard.repository;
 import com.web.stard.domain.Member;
 import com.web.stard.domain.Post;
 import com.web.stard.domain.PostType;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,9 +13,11 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
     /* 타입 별 게시글 전체 조회 (최근 순) */
     List<Post> findByTypeOrderByCreatedAtDesc(PostType type);
+    Page<Post> findByTypeOrderByCreatedAtDesc(PostType type, Pageable pageable);
 
     /* 타입 별 게시글 전체 조회 (최근 순 + 페이징) */
-    List<Post> findByType(PostType type, Pageable pageable);
+//    List<Post> findByType(PostType type, Pageable pageable);
+    Page<Post> findByType(PostType type, Pageable pageable);
 
     /* 타입 별 게시글 세부 조회 */
     Optional<Post> findByIdAndType(Long id, PostType type);
@@ -49,4 +52,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByTypeAndCategoryAndContentContaining(PostType type, String category, String searchWord, Pageable pageable);
     /* 카테고리 - 작성자 검색 (최근 순 + 페이징) */
     List<Post> findByTypeAndCategoryAndMember(PostType type, String category, Member member, Pageable pageable);
+
+    List<Post> findByTypeInOrderByCreatedAtDesc(List<PostType> faqAndQnaTypes);
 }

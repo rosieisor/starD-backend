@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,22 +29,22 @@ public class CommunityService {
 
 
     /* 커뮤니티 게시글 조회 (페이지화 X) */
-    public List<Post> getAllCommunityPost() {
-        List<Post> posts = postRepository.findByTypeOrderByCreatedAtDesc(PostType.COMM);
-
-        for (Post p : posts) { // 스크랩 수, 공감 수
-            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.COMM);
-            List<StarScrap> allScrapList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.SCRAP, PostType.COMM);
-
-            p.setStarCount(allStarList.size());
-            p.setScrapCount(allScrapList.size());
-        }
-
-        return posts;
-    }
+//    public List<Post> getAllCommunityPost() {
+//        List<Post> posts = postRepository.findByTypeOrderByCreatedAtDesc(PostType.COMM);
+//
+//        for (Post p : posts) { // 스크랩 수, 공감 수
+//            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.COMM);
+//            List<StarScrap> allScrapList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.SCRAP, PostType.COMM);
+//
+//            p.setStarCount(allStarList.size());
+//            p.setScrapCount(allScrapList.size());
+//        }
+//
+//        return posts;
+//    }
 
     /* 커뮤니티 게시글 조회 (페이지화 추가) */
-    public List<Post> getAllCommunityPost(int page) {
+    public Page<Post> getAllCommunityPost(int page) {
 //        return postRepository.findByTypeOrderByCreatedAtDesc(PostType.POST); // 페이지화 X (그냥 전체 조회)
 
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
@@ -51,7 +52,7 @@ public class CommunityService {
         // page -> 배열 인덱스처럼 들어가서 -1 해야 함
         // 한 페이지에 Post 10개 (개수는 추후 수정)
 
-        List<Post> posts = postRepository.findByType(PostType.COMM, pageable);
+        Page<Post> posts = (Page<Post>) postRepository.findByType(PostType.COMM, pageable);
 
         for (Post p : posts) { // 스크랩 수, 공감 수
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.COMM);

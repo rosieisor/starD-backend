@@ -6,6 +6,7 @@ import com.web.stard.repository.StarScrapRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -54,14 +55,15 @@ public class NoticeService {
         return posts;
     }
 
-    public List<Post> getAllNotice(int page) {
+    // Notice 리스트 조회 (페이지화o)
+    public Page<Post> getAllNotice(int page) {
 
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page-1, 10, sort);
         // page -> 배열 인덱스처럼 들어가서 -1 해야 함
         // 한 페이지에 Post 10개 (개수는 추후 수정)
 
-        List<Post> posts = postRepository.findByType(PostType.NOTICE, pageable);
+        Page<Post> posts = postRepository.findByType(PostType.NOTICE, pageable);
 
         for (Post p : posts) { // 스크랩 수, 공감 수
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.NOTICE);

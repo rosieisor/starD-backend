@@ -6,6 +6,7 @@ import com.web.stard.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +31,9 @@ public class FaqController {
         return post;
     }
 
-    // faq 리스트 조회
+    // faq 리스트 조회(페이지화o)
     @GetMapping
-    public List<Post> getAllFaq(@RequestParam("page") int page) {
+    public Page<Post> getAllFaq(@RequestParam(value = "page", defaultValue = "1", required = false) int page) {
         return faqService.getAllFaq(page);
     }
 

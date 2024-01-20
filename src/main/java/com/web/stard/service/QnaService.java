@@ -7,14 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +40,7 @@ public class QnaService {
     }
 
     // qna 리스트 조회 (비회원은 리스트 조회 가능)
-    public List<Post> getAllQna(int page) {
+    public Page<Post> getAllQna(int page) {
 
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page-1, 10, sort);
@@ -104,25 +103,45 @@ public class QnaService {
     }
 
     // faq, qna 순 최신 순 리스트 보기
-    public List<Post> getAllFaqsAndQnas() {
-        List<Post> faqs = postRepository.findByTypeOrderByCreatedAtDesc(PostType.FAQ);
-        for (Post p : faqs) { // 공감 수
-            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.FAQ);
+    public Page<Post> getAllFaqsAndQnas(int page) {
+        // 정렬 방식을 최신 날짜순으로 설정
+        Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
+
+        // 현재 페이지에 해당하는 데이터만큼 가져오도록 설정
+        Pageable pageable = PageRequest.of(page - 1, 10, sort);
+
+        // FAQ와 QNA를 나타내는 PostType 리스트 생성
+        List<PostType> faqAndQnaTypes = Arrays.asList(PostType.FAQ, PostType.QNA);
+
+        // FAQ와 QNA 데이터 조회
+        List<Post> faqsAndQnas = postRepository.findByTypeInOrderByCreatedAtDesc(faqAndQnaTypes);
+
+        // 각 FAQ와 QNA의 공감 수 설정
+        for (Post p : faqsAndQnas) {
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, p.getType());
             p.setStarCount(allStarList.size());
         }
 
-        List<Post> qnas = postRepository.findByTypeOrderByCreatedAtDesc(PostType.QNA);
-        for (Post p : qnas) { // 공감 수
-            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.QNA);
-            p.setStarCount(allStarList.size());
-        }
+        // FAQ를 우선적으로 보여주기 위해 정렬
+        faqsAndQnas.sort((post1, post2) -> {
+            if (post1.getType() == PostType.FAQ && post2.getType() != PostType.FAQ) {
+                return -1;
+            } else if (post1.getType() != PostType.FAQ && post2.getType() == PostType.FAQ) {
+                return 1;
+            } else {
+                return post2.getCreatedAt().compareTo(post1.getCreatedAt());
+            }
+        });
 
-        List<Post> allFaqsAndQnas = new ArrayList<>();
-        allFaqsAndQnas.addAll(faqs);
-        allFaqsAndQnas.addAll(qnas);
+        // 최종 결과를 페이지에 맞게 자르기
+        int startIndex = pageable.getPageNumber() * pageable.getPageSize();
+        int endIndex = Math.min(startIndex + pageable.getPageSize(), faqsAndQnas.size());
+        List<Post> slicedResults = faqsAndQnas.subList(startIndex, endIndex);
 
-        return allFaqsAndQnas;
+        return new PageImpl<>(slicedResults, pageable, faqsAndQnas.size());
     }
+
+
 
     // 전체 검색 (전체, 제목/내용/작성자)
     public List<Post> searchQnaAndFaq(String searchType, String searchWord) {
