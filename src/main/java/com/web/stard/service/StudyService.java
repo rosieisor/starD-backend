@@ -40,6 +40,23 @@ public class StudyService {
 
     }
 
+    // 조회수 반영
+    public Study getStudyDetail(Authentication authentication, Long id) {
+        Optional<Study> result = studyRepository.findById(id);
+
+        if (result.isEmpty())
+            return null;
+        Study study = result.get();
+
+        if (!study.getRecruiter().getId().equals(authentication.getName())) {
+            // 작성자 != 현재 로그인 한 유저면 조회수 증가
+            study.setViewCount(study.getViewCount()+1);
+            studyRepository.save(study);
+        }
+
+        return study;
+    }
+
     @Transactional
     public Page<Study> findByRecruiter(Authentication authentication, int page) {
 
