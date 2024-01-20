@@ -122,7 +122,7 @@ public class TodoService {
         String[] assigneeMem = assigneeStr.split(",");
         List<Assignee> assignees = new ArrayList<>();
         for (String ass : assigneeMem) {
-            Member member = memberService.find(ass);
+            Member member = memberService.findByNickname(ass);
 
             Assignee assignee = new Assignee();
             assignee.setToDo(toDo);
@@ -192,7 +192,9 @@ public class TodoService {
     @Transactional
     public boolean deleteTodo(Long toDoId) {
         ToDo toDo = getToDo(toDoId);
+        List<Assignee> assignees = getAssignee(toDoId);
 
+        assigneeRepository.deleteAll(assignees); // 담당자 삭제
         todoRepository.delete(toDo); // TO DO 삭제
 
         if (getToDo(toDoId) == null) { // 삭제됨
