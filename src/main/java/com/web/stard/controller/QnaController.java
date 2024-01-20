@@ -70,16 +70,31 @@ public class QnaController {
         return qnaService.getAllFaqsAndQnas(page);
     }
 
-    // 전체 검색
+    // 전체 검색(페이지화x)
+//    @GetMapping("/search")
+//    public List<Post> searchQnaAndFaq(@RequestParam String searchType, @RequestParam String searchWord) {
+//        return qnaService.searchQnaAndFaq(searchType, searchWord);
+//    }
+
+    // 전체 검색(페이지화o)
     @GetMapping("/search")
-    public List<Post> searchQnaAndFaq(@RequestParam String searchType, @RequestParam String searchWord) {
-        return qnaService.searchQnaAndFaq(searchType, searchWord);
+    public Page<Post> searchQnaAndFaq(@RequestParam String searchType, @RequestParam String searchWord,
+                                      @RequestParam(value = "page", defaultValue = "1", required = false)  int page) {
+        return qnaService.searchQnaAndFaq(searchType, searchWord, page);
     }
 
-    // 카테고리 - 전체 검색
+    // 카테고리 - 전체 검색(페이지화x)
+//    @GetMapping("/search/category")
+//    public List<Post> searchQnaOrFaqByCategory(@RequestParam String searchType, @RequestParam String category,
+//                                               @RequestParam String searchWord) {
+//        return qnaService.searchQnaOrFaqByCategory(searchType, category, searchWord);
+//    }
+
+    // 카테고리 - 전체 검색(페이지화o)
     @GetMapping("/search/category")
-    public List<Post> searchQnaOrFaqByCategory(@RequestParam String searchType, @RequestParam String category,
-                                               @RequestParam String searchWord) {
-        return qnaService.searchQnaOrFaqByCategory(searchType, category, searchWord);
+    public Page<Post> searchQnaOrFaqByCategory(@RequestParam String searchType, @RequestParam String category,
+                                               @RequestParam String searchWord,
+                                               @RequestParam(value = "page", defaultValue = "1", required = false)  int page) {
+        return qnaService.searchQnaOrFaqByCategory(searchType, category, searchWord, page);
     }
 }

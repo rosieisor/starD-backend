@@ -40,18 +40,18 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 
     /* 제목 검색 (최근 순 + 페이징) */
-    List<Post> findByTypeAndTitleContaining(PostType type, String searchWord, Pageable pageable);
+    Page<Post> findByTypeAndTitleContaining(PostType type, String searchWord, Pageable pageable);
     /* 내용 검색 (최근 순 + 페이징) */
-    List<Post> findByTypeAndContentContaining(PostType type, String searchWord, Pageable pageable);
+    Page<Post> findByTypeAndContentContaining(PostType type, String searchWord, Pageable pageable);
     /* 작성자 검색 (최근 순 + 페이징) */
-    List<Post> findByTypeAndMember(PostType type, Member member, Pageable pageable);
+    Page<Post> findByTypeAndMember(PostType type, Member member, Pageable pageable);
 
     /* 카테고리 - 제목 검색 (최근 순 + 페이징) */
-    List<Post> findByTypeAndCategoryAndTitleContaining(PostType type, String category, String searchWord, Pageable pageable);
+    Page<Post> findByTypeAndCategoryAndTitleContaining(PostType type, String category, String searchWord, Pageable pageable);
     /* 카테고리 - 내용 검색 (최근 순 + 페이징) */
-    List<Post> findByTypeAndCategoryAndContentContaining(PostType type, String category, String searchWord, Pageable pageable);
+    Page<Post> findByTypeAndCategoryAndContentContaining(PostType type, String category, String searchWord, Pageable pageable);
     /* 카테고리 - 작성자 검색 (최근 순 + 페이징) */
-    List<Post> findByTypeAndCategoryAndMember(PostType type, String category, Member member, Pageable pageable);
+    Page<Post> findByTypeAndCategoryAndMember(PostType type, String category, Member member, Pageable pageable);
 
     List<Post> findByTypeInOrderByCreatedAtDesc(List<PostType> faqAndQnaTypes);
 }
