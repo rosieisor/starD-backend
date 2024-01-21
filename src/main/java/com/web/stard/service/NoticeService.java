@@ -129,7 +129,7 @@ public class NoticeService {
         return postRepository.findById(id);
     }
 
-    // 전체 검색
+    // 전체 검색(페이지화x)
     public List<Post> searchNoticePost(String searchType, String searchWord) {
         List<Post> posts = null;
 
@@ -137,6 +137,28 @@ public class NoticeService {
             posts = postRepository.findByTypeAndTitleContainingOrderByCreatedAtDesc(PostType.NOTICE, searchWord);
         } else if (searchType.equals("내용")) {
             posts = postRepository.findByTypeAndContentContainingOrderByCreatedAtDesc(PostType.NOTICE, searchWord);
+        }
+
+        for (Post p : posts) { // 스크랩 수, 공감 수
+            List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.NOTICE);
+
+            p.setStarCount(allStarList.size());
+        }
+
+        return posts;
+    }
+
+    // 전체 검색(페이지화o)
+    public Page<Post> searchNoticePost(String searchType, String searchWord, int page) {
+        Page<Post> posts = null;
+
+        Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page - 1, 10, sort);
+
+        if (searchType.equals("제목")) {
+            posts = postRepository.findByTypeAndTitleContaining(PostType.NOTICE, searchWord, pageable);
+        } else if (searchType.equals("내용")) {
+            posts = postRepository.findByTypeAndContentContaining(PostType.NOTICE, searchWord, pageable);
         }
 
         for (Post p : posts) { // 스크랩 수, 공감 수

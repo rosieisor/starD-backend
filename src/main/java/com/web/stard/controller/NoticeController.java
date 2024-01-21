@@ -77,10 +77,16 @@ public class NoticeController {
         return noticeService.findTypeById(id, authentication);
     }
 
-    // 전체 검색
-    @GetMapping("/search")
-    public List<Post> searchCommPost(@RequestParam String searchType, @RequestParam String searchWord) {
-        return noticeService.searchNoticePost(searchType, searchWord);
-    }
+    // 전체 검색(페이지화x)
+//    @GetMapping("/search")
+//    public List<Post> searchCommPost(@RequestParam String searchType, @RequestParam String searchWord) {
+//        return noticeService.searchNoticePost(searchType, searchWord);
+//    }
 
+    // 전체 검색(페이지화o)
+    @GetMapping("/search")
+    public Page<Post> searchCommPost(@RequestParam String searchType, @RequestParam String searchWord,
+                                     @RequestParam(value = "page", defaultValue = "1", required = false)  int page) {
+        return noticeService.searchNoticePost(searchType, searchWord, page);
+    }
 }

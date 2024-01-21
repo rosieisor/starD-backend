@@ -126,8 +126,8 @@ public class CommunityService {
     }
 
     /* 전체 검색 (페이지화) */
-    public List<Post> searchCommPost(String searchType, String searchWord, int page) {
-        List<Post> posts;
+    public Page<Post> searchCommPost(String searchType, String searchWord, int page) {
+        Page<Post> posts;
 
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page-1, 10, sort);
@@ -183,8 +183,8 @@ public class CommunityService {
     }
 
     /* 카테고리 - 전체 검색 (페이지화) */
-    public List<Post> searchCommPostByCategory(String searchType, String category, String searchWord, int page) {
-        List<Post> posts;
+    public Page<Post> searchCommPostByCategory(String searchType, String category, String searchWord, int page) {
+        Page<Post> posts;
 
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page-1, 10, sort);
