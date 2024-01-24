@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -119,7 +118,7 @@ public class ReportController {
 
     // 특정 report의 신고 사유 조회
     @GetMapping("/reason/{reportId}")
-    public Set<String> getReportReasons(@PathVariable Long reportId, Authentication authentication) {
+    public Map<String, Integer> getReportReasons(@PathVariable Long reportId, Authentication authentication) {
         return reportService.getReportReasons(reportId, authentication);
     }
 
