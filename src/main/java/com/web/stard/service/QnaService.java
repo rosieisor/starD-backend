@@ -188,14 +188,13 @@ public class QnaService {
         return posts;
     }
 
-    // TODO 페이징 오류 수정 필요
     // 전체 검색 (전체, 제목/내용/작성자) - 페이지화o
     public Page<Post> searchQnaAndFaq(String searchType, String searchWord, int page) {
-        List<Post> qnas = new ArrayList<>();
-        List<Post> faqs = new ArrayList<>();
-
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page - 1, 10, sort);
+
+        List<Post> qnas = null;
+        List<Post> faqs = null;
 
         if (searchType.equals("제목")) {
             faqs = postRepository.findByTypeAndTitleContainingOrderByCreatedAtDesc(PostType.FAQ, searchWord);
@@ -203,29 +202,26 @@ public class QnaService {
         } else if (searchType.equals("내용")) {
             faqs = postRepository.findByTypeAndContentContainingOrderByCreatedAtDesc(PostType.FAQ, searchWord);
             qnas = postRepository.findByTypeAndContentContainingOrderByCreatedAtDesc(PostType.QNA, searchWord);
-        } else {    // 작성자
+        } else { // 작성자
             if (searchWord.equals("관리자")) {
                 faqs = postRepository.findByTypeOrderByCreatedAtDesc(PostType.FAQ);
-            }
-            else {
+            } else {
                 Member member = memberService.findByNickname(searchWord);
                 if (member == null) {
-                    return null;
+                    return Page.empty();
                 }
                 qnas = postRepository.findByTypeAndMemberOrderByCreatedAtDesc(PostType.QNA, member);
             }
         }
 
-        // 공감 수
+        // 공감 수 설정
         for (Post p : faqs) {
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.FAQ);
-
             p.setStarCount(allStarList.size());
         }
 
         for (Post p : qnas) {
             List<StarScrap> allStarList = starScrapRepository.findAllByPostAndTypeAndTableType(p, ActType.STAR, PostType.QNA);
-
             p.setStarCount(allStarList.size());
         }
 
@@ -234,8 +230,12 @@ public class QnaService {
         posts.addAll(faqs);
         posts.addAll(qnas);
 
-//        return posts;
-        return new PageImpl<>(posts, pageable, posts.size());
+        // 최종 결과를 페이지에 맞게 자르기
+        int startIndex = pageable.getPageNumber() * pageable.getPageSize();
+        int endIndex = Math.min(startIndex + pageable.getPageSize(), posts.size());
+        List<Post> slicedResults = posts.subList(startIndex, endIndex);
+
+        return new PageImpl<>(slicedResults, pageable, posts.size());
     }
 
     // 카테고리별 검색 (qna/faq, 제목/내용/작성자) - 페이지화x
