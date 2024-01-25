@@ -9,15 +9,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Transactional
 @Service
@@ -267,7 +263,7 @@ public class ReportService {
     }
 
     // 특정 report의 신고 사유 조회
-    public Set<String> getReportReasons(Long reportId, Authentication authentication) {
+    public Map<String, Integer> getReportReasons(Long reportId, Authentication authentication) {
         checkIfMemberIsAdmin(authentication);
 
         Report report = reportRepository.findById(reportId)
@@ -275,21 +271,26 @@ public class ReportService {
 
         List<ReportDetail> reportDetails = reportDetailRepository.findByReportId(reportId);
 
-        Set<String> reasons = new HashSet<>();
+        Map<String, Integer> reasonsWithCount = new HashMap<>();
 
         for (ReportDetail reportDetail : reportDetails) {
             ReportReason reason = reportDetail.getReason();
+            String reasonKey = null;
+
             if (reason == ReportReason.ETC) {
                 String customReason = reportDetail.getCustomReason();
                 if (customReason != null && !customReason.isEmpty()) {
-                    reasons.add(customReason);
+                    reasonKey = customReason;
                 }
             } else {
-                reasons.add(reason.name());
+                reasonKey = reason.name();
             }
+
+            // Map에서 특정 신고 사유에 1을 더한 후 다시 저장
+            reasonsWithCount.put(reasonKey, reasonsWithCount.getOrDefault(reasonKey, 0) + 1);
         }
 
-        return reasons;
+        return reasonsWithCount;
     }
 
     // 신고 반려
