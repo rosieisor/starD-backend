@@ -1,31 +1,38 @@
 package com.web.stard.config.email;
 
+import com.web.stard.domain.Member;
+import com.web.stard.repository.MemberRepository;
+import com.web.stard.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.Duration;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MailService{
+public class EmailServiceImpl implements EmailService {
+
+    private final MemberService memberService;
 
     private final JavaMailSender emailSender;
-
-
     private static final String AUTH_CODE_PREFIX = "AuthCode ";
+    private static final String RESET_PW_SUBJECT = "[StarD] 비밀번호 재설정 안내 메일";
+
+    private static final Long RESET_PW_TOKEN_EXPIRE_TIME = 12 * 60 * 60 * 1000L;
+
+    private static final String RESET_PW_PREFIX = "ResetPwToken ";
 
     private final RedisTemplate redisTemplate;
 
@@ -34,6 +41,9 @@ public class MailService{
 
     @Value("${spring.mail.username}")
     private String adminAccount;
+
+    @Value("${base.back-end.url}")
+    private String baseUrl;
 
     /*
     sendEmail( ): 이메일을 발송하는 메서드 파라미터
@@ -48,6 +58,8 @@ public class MailService{
             throw new IllegalArgumentException();
         }
     }
+
+
 
     /*
     createEmailForm(): 발송할 이메일 데이터를 설정하는 메서드
@@ -88,6 +100,7 @@ public class MailService{
     인증 코드를 생성 후 수신자 이메일로 발송하는 메서드.
     이후 인증 코드를 검증하기 위해 생성한 인증 코드를 Redis에 저장한다.
      */
+    @Override
     public void sendCodeToEmail(String toEmail) throws Exception {
         String authCode = this.createAuthCode();
         sendEmail(toEmail, authCode);
@@ -102,7 +115,7 @@ public class MailService{
     파라미터로 전달받은 이메일을 통해 Redis에 저장되어 있는 인증 코드를 조회한 후, 파라미터로 전달 받은 인증 코드와 비교한다.
     만약 두 코드가 동일하다면 true를, Redis에서 Code가 없거나 일치하지 않는다면 false를 반화한다.
      */
-
+    @Override
     public boolean verifiedCode(String email, String authCode) throws Exception{
         String redisAuthCode = (String) redisTemplate.opsForValue().get(AUTH_CODE_PREFIX + email);
 
@@ -117,8 +130,53 @@ public class MailService{
         return authResult;
     }
 
+    private final MemberRepository memberRepository;
 
+    @Override
+    @Transactional
+    public void sendEmailResetPw(EmailDto emailDto) throws MessagingException {
 
+        Member member = memberService.findByEmail(emailDto.getEmail());
 
+        String pwResetToken = UUID.randomUUID().toString();
+
+        boolean isExist = true;
+
+        while(isExist){
+
+            String existEmail = (String) redisTemplate.opsForValue().get(RESET_PW_PREFIX + pwResetToken);
+            if (existEmail == null)
+                break;
+            else
+                pwResetToken = UUID.randomUUID().toString();
+        }
+
+        String pwResetUrl = baseUrl + "/reset-password?token=" + pwResetToken;
+
+        MimeMessage message = emailSender.createMimeMessage();
+        message.addRecipients(MimeMessage.RecipientType.TO, emailDto.getEmail());
+        message.setSubject(RESET_PW_SUBJECT);
+
+        String messageContent = "<h2>비밀번호 재설정 안내 </h2> <br>" +
+                "<p>안녕하세요. " + member.getId() +" 님</p>" +
+                "<p>본 메일은 비밀번호 재설정을 위해 StarD에서 발송하는 메일입니다. 12시간 이내에 " +
+                "링크를 클릭하여 비밀번호 재설정을 완료해주세요.</p>" +
+                "<a href=\"" + pwResetUrl + "\">비밀번호 재설정</a>";
+
+        message.setText(messageContent, "UTF-8", "html");
+        String sender = adminAccount + "@naver.com";
+        message.setFrom(new InternetAddress(sender));
+
+        try {
+            // TODO 로그 삭제
+            log.info("비밀번호 재설정 Url 생성: " + pwResetUrl);
+            emailSender.send(message);
+            redisTemplate.opsForValue().set(RESET_PW_PREFIX + pwResetToken, emailDto.getEmail(), Duration.ofMillis(RESET_PW_TOKEN_EXPIRE_TIME));
+        } catch (MailException e) {
+            e.printStackTrace();
+            log.debug("MailService.sendEmail exception occur toEmail: {}", emailDto.getEmail());
+            throw new IllegalArgumentException();
+        }
+    }
 
 }

@@ -78,7 +78,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
             // 이메일 인증
             "/emails/verifications",
-            "/emails/verification-requests"
+            "/emails/verification-requests",
+
+            "/find-password",
+            "/reset-password"
     };
 
     @Override

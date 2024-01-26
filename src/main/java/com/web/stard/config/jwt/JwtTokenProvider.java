@@ -31,6 +31,8 @@ public class JwtTokenProvider {
     //    private static final long ACCESS_TOKEN_EXPIRE_TIME = 60 * 1000L;              // 유효 기간 Test 용 (1분)
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;    // 7일
 
+    private static final Long RESET_PW_TOKEN_EXPIRE_TIME = 12 * 60 * 60 * 1000L;
+
     private final Key key;
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
@@ -67,6 +69,19 @@ public class JwtTokenProvider {
                 .refreshToken(refreshToken)
                 .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
                 .build();
+    }
+
+    public String createToken(String email) {
+        Claims claims = Jwts.claims().setSubject(email);
+
+        Date now = new Date();
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + RESET_PW_TOKEN_EXPIRE_TIME))
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
     }
 
     // JWT 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
