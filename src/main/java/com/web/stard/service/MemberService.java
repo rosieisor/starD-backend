@@ -51,9 +51,6 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private static final String RESET_PW_PREFIX = "ResetPwToken ";
 
-    @Value("${base.front-end.url}")
-    private String baseUrl;
-
     @Transactional
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email)
