@@ -2,11 +2,16 @@ package com.web.stard.service;
 
 import com.web.stard.chat_stomp.ChatMessage;
 import com.web.stard.chat_stomp.ChatMessageRepository;
+import com.web.stard.config.jwt.JwtTokenProvider;
 import com.web.stard.domain.*;
+import com.web.stard.dto.ResetPasswordResponse;
 import com.web.stard.repository.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
@@ -21,23 +28,34 @@ import java.util.Optional;
 
 @Service
 @Getter @Setter
-@AllArgsConstructor
+@Slf4j
+@RequiredArgsConstructor
 public class MemberService {
 
-    MemberRepository memberRepository;
-    InterestRepository interestRepository;
-    PasswordEncoder passwordEncoder;
-    StudyMemberRepository studyMemberRepository;
-    ProfileRepository profileRepository;
-    StudyRepository studyRepository;
-    ApplicantRepository applicantRepository;
-    AssigneeRepository assigneeRepository;
-    ChatMessageRepository chatMessageRepository;
-    EvaluationRepository evaluationRepository;
-    PostRepository postRepository;
-    ReplyRepository replyRepository;
-    StudyPostRepository studyPostRepository;
-    StarScrapRepository starScrapRepository;
+    private final MemberRepository memberRepository;
+    private final InterestRepository interestRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final StudyMemberRepository studyMemberRepository;
+    private final ProfileRepository profileRepository;
+    private final StudyRepository studyRepository;
+    private final ApplicantRepository applicantRepository;
+    private final AssigneeRepository assigneeRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final EvaluationRepository evaluationRepository;
+    private final PostRepository postRepository;
+    private final ReplyRepository replyRepository;
+    private final StudyPostRepository studyPostRepository;
+    private final StarScrapRepository starScrapRepository;
+
+    private final RedisTemplate redisTemplate;
+    private final JwtTokenProvider jwtTokenProvider;
+    private static final String RESET_PW_PREFIX = "ResetPwToken ";
+
+    @Transactional
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원"));
+    }
 
     public Member find(String id) {
         Optional<Member> result = memberRepository.findById(id);
@@ -246,5 +264,28 @@ public class MemberService {
     // authentication으로 닉네임 찾기
     public Member findNickNameByAuthentication(Authentication authentication) {
         return memberRepository.findNicknameById(authentication.getName());
+    }
+
+    public ResetPasswordResponse resetPassword(HttpServletRequest request, String token) throws Exception {
+        String email = validateResetPwToken(token);
+
+        String accessToken = jwtTokenProvider.createToken(email);
+
+        // TODO 로그 삭제
+        log.info("비밀번호 재설정 반환 uri: " + request.getRequestURI() + "?token=" + token);
+
+        return ResetPasswordResponse.builder()
+                .uri(request.getRequestURI() + "?token=" + token)
+                .email(email)
+                .accessToken(accessToken).build();
+    }
+
+    private String validateResetPwToken(String token) throws Exception {
+        String email = (String)redisTemplate.opsForValue().get(RESET_PW_PREFIX + token);
+
+        if (email == null)
+            throw new Exception();
+
+        return email;
     }
 }
