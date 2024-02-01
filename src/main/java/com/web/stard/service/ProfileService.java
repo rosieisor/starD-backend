@@ -1,8 +1,9 @@
 package com.web.stard.service;
 
-import com.web.stard.domain.Member;
-import com.web.stard.domain.Profile;
+import com.web.stard.domain.*;
 import com.web.stard.dto.ProfileDto;
+import com.web.stard.dto.ProfileResponse;
+import com.web.stard.repository.PostRepository;
 import com.web.stard.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,6 +30,7 @@ public class ProfileService {
 
     private final ProfileRepository profileRepository;
     private final MemberService memberService;
+    private final PostRepository postRepository;
 
     @Value("${file.profileImagePath}")
     private String uploadFolder;
@@ -163,6 +166,24 @@ public class ProfileService {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
+    }
+
+    /* 다른 사용자 프로필 조회 */
+    public ProfileResponse getUserProfile(String memberId) {
+        Member member = memberService.find(memberId);
+        Profile profile = member.getProfile();
+
+        ProfileResponse profileResponse = ProfileResponse.builder()
+                .id(profile.getId())
+                .memberId(memberId)
+                .nickname(member.getNickname())
+                .introduce(profile.getIntroduce())
+                .credibility(profile.getCredibility())
+                .imgName(profile.getImgName())
+                .imgUrl(profile.getImgUrl())
+                .build();
+
+        return profileResponse;
     }
 
 //    public Profile test(ProfileDto profileDto) {

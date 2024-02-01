@@ -516,7 +516,7 @@ public class StarScrapService {
                 }
             }
         } else if (status.equals("open")) {
-            Page<Study> studyList = studyService.findByRecruiter(authentication, page);
+            Page<Study> studyList = studyService.findByRecruiter(authentication.getName(), page);
             if (type.equals("star")) {
                 for (Study study : studyList.getContent()) {
                     if (existsStudyStar(member, study) == null) {

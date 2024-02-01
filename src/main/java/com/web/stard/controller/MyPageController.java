@@ -1,10 +1,8 @@
 package com.web.stard.controller;
 
 import com.web.stard.domain.*;
-import com.web.stard.service.EvaluationService;
-import com.web.stard.service.MemberService;
-import com.web.stard.service.ProfileService;
-import com.web.stard.service.StudyService;
+import com.web.stard.dto.ProfileResponse;
+import com.web.stard.service.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -33,6 +31,7 @@ public class MyPageController {
 
     private final ProfileService profileService;
     private final StudyService studyService;
+    private final CommunityService communityService;
 
     private final EvaluationService evaluationService;
 
@@ -233,6 +232,26 @@ public class MyPageController {
         return profileService.getProfileImage(imageUrl);
     }
 
+    /* 다른 사용자 프로필 조회 */
+    @GetMapping("/profile/{memberId}")
+    public ProfileResponse getUserProfile(@PathVariable String memberId) {
+        return profileService.getUserProfile(memberId);
+    }
+
+    /* 다른 사용자 프로필 조회 - 스터디 모집 게시글 */
+    @GetMapping("/profile/{memberId}/open-study")
+    public Page<Study> findUserOpenHistory(@PathVariable String memberId,
+                                           @RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+        return studyService.findByRecruiter(memberId, page);
+    }
+
+    /* 다른 사용자 프로필 조회 - 커뮤니티 게시글 */
+    @GetMapping("/profile/{memberId}/community")
+    public Page<Post> findUserCommunityPost(@PathVariable String memberId,
+                                            @RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+        return communityService.findUserCommunityPost(memberId, page);
+    }
+
     // [U] 개인 신뢰도 수정
     @PutMapping("/credibility")
     public Profile updateCredibility(Authentication authentication) {
@@ -255,7 +274,7 @@ public class MyPageController {
     // [R] 스터디 개설 내역
     @GetMapping("/open-study")
     public Page<Study> findOpenHistory(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
-        return studyService.findByRecruiter(authentication, page);
+        return studyService.findByRecruiter(authentication.getName(), page);
     }
 
     // [R] 스터디 참여 내역
