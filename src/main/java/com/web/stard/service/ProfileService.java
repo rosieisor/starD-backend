@@ -3,7 +3,6 @@ package com.web.stard.service;
 import com.web.stard.domain.*;
 import com.web.stard.dto.ProfileDto;
 import com.web.stard.dto.ProfileResponse;
-import com.web.stard.repository.PostRepository;
 import com.web.stard.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,7 +28,6 @@ public class ProfileService {
 
     private final ProfileRepository profileRepository;
     private final MemberService memberService;
-    private final PostRepository postRepository;
 
     @Value("${file.profileImagePath}")
     private String uploadFolder;
