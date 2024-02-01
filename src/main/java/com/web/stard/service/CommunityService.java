@@ -259,4 +259,11 @@ public class CommunityService {
             return true;
         } return false;
     }
+
+
+    /* 사용자 작성한 게시글 */
+    public Page<Post> findUserCommunityPost(String memberId, int page) {
+        Member member = memberService.find(memberId);
+        return searchCommPost("작성자", member.getNickname(), page);
+    }
 }
