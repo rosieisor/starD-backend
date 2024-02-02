@@ -17,6 +17,10 @@ public class Report {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "member_id")  // 신고된 회원
+    private Member member;
+
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 

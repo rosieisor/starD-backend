@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,7 +48,7 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
 
     /* 개설자로 progressStatus가 null인 스터디 검색 */
     @Query("SELECT s FROM Study s WHERE s.recruiter = :recruiter AND s.progressStatus IS NULL")
-    List<Study> findStudiesByRecruiterAndNullProgressStatus(Member recruiter);
+    List<Study> findStudiesByRecruiterAndNullProgressStatus(@Param("recruiter") Member recruiter);
     /* 진행 완료된 스터디 (개설자로 검색) */
     List<Study> findByRecruiterAndProgressStatus(Member member, ProgressStatus progressStatus);
 }

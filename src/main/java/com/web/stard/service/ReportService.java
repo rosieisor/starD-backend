@@ -109,6 +109,7 @@ public class ReportService {
         } else {
             // 신고 내역이 없는 경우 - 신고 내역에 추가, 신고자 정보 추가
             Report report = Report.builder()
+                    .member(post.getMember())
                     .post(post)
                     .tableType(post.getType())
                     .build();
@@ -404,6 +405,22 @@ public class ReportService {
 
         for (Member member : members) {
             if (member.getReportCount() >= 10) {
+                // 탈퇴할 회원의 글과 댓글에 대한 Report 가져오기
+                List<Report> deleteReports = reportRepository.findByMember(member);
+
+                // deleteReports에 해당하는 reportDetail 삭제
+                if (deleteReports != null) {
+                    for (Report report : deleteReports) {
+                        List<ReportDetail> reportDetails = reportDetailRepository.findByReportId(report.getId());
+                        if (!reportDetails.isEmpty()) {
+                            reportDetailRepository.deleteAll(reportDetails);
+                        }
+                    }
+
+                    // deleteReports 삭제
+                    reportRepository.deleteAll(deleteReports);
+                }
+
                 // 해당 회원의 공감, 스크랩 내역 삭제
                 starScrapRepository.deleteByMember(member);
 
