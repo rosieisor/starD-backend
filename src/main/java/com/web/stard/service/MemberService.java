@@ -149,9 +149,6 @@ public class MemberService {
         // 강제 탈퇴인지 확인
         if (userRole == Role.ADMIN && !id.equals(authentication.getName())) {
             forceDelete = true;
-            if (member.getReportCount() < 1) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("누적 신고 수가 10회 미만이면 강제 탈퇴 처리가 불가능합니다.");
-            }
         }
 
         // 강제 탈퇴 시 비밀번호 확인 및 스터디 진행 여부와 관계 없이 탈퇴 가능
