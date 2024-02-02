@@ -266,4 +266,16 @@ public class CommunityService {
         Member member = memberService.find(memberId);
         return searchCommPost("작성자", member.getNickname(), page);
     }
+
+    /* 사용자가 작성한 모든 글 조회(마이페이지) */
+    public Page<Post> findPostByMember(String memberId, int page) {
+        Member member = memberService.find(memberId);
+
+        Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page - 1, 10, sort);
+
+        Page<Post> posts = postRepository.findByMember(member, pageable);
+
+        return posts;
+    }
 }

@@ -34,6 +34,7 @@ public class MyPageController {
     private final CommunityService communityService;
 
     private final EvaluationService evaluationService;
+    private final ReplyService replyService;
 
     /* 정보 반환 */
     @GetMapping("/update")
@@ -308,4 +309,17 @@ public class MyPageController {
     public Evaluation getMyEvaluation(@PathVariable Long evaluationId, Authentication authentication) {
         return evaluationService.getMyEvaluation(evaluationId, authentication);
     }
+
+    /* 내가 작성한 글 조회 */
+    @GetMapping("/post")
+    public Page<Post> findMyPost(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+        return communityService.findPostByMember(authentication.getName(), page);
+    }
+
+    /* 내가 작성한 댓글 조회 */
+    @GetMapping("/reply")
+    public Page<Reply> findMyReply(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+        return replyService.findByMember(authentication.getName(), page);
+    }
+
 }
