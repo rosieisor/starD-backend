@@ -2,7 +2,7 @@
 package com.web.stard.service;
 
 import com.web.stard.domain.*;
-import com.web.stard.dto.StudyDto;
+import com.web.stard.domain.board.study.dto.StudyDto;
 import com.web.stard.repository.*;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

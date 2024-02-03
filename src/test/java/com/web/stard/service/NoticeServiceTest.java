@@ -1,10 +1,10 @@
 //package com.web.stard.service;
 //
-//import com.web.stard.domain.Member;
-//import com.web.stard.domain.Post;
-//import com.web.stard.domain.PostType;
-//import com.web.stard.domain.Role;
-//import com.web.stard.repository.PostRepository;
+//import com.web.stard.domain.member.domain.Member;
+//import com.web.stard.domain.board.global.domain.Post;
+//import com.web.stard.domain.board.global.domain.enums.PostType;
+//import com.web.stard.domain.member.domain.Role;
+//import com.web.stard.domain.board.global.repository.PostRepository;
 //import org.junit.jupiter.api.Test;
 //import org.junit.runner.RunWith;
 //import org.springframework.beans.factory.annotation.Autowired;

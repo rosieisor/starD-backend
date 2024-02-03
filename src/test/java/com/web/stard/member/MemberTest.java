@@ -1,13 +1,10 @@
 package com.web.stard.member;
 
-import com.web.stard.domain.Member;
-import com.web.stard.service.MemberService;
-import org.junit.Assert;
+import com.web.stard.domain.member.application.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @SpringBootTest
