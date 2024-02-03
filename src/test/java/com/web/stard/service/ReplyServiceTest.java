@@ -2,8 +2,8 @@
 package com.web.stard.service;
 
 import com.web.stard.domain.*;
-import com.web.stard.dto.StudyDto;
-import com.web.stard.repository.PostRepository;
+import com.web.stard.domain.board.study.dto.StudyDto;
+import com.web.stard.domain.board.global.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,11 +1,10 @@
 package com.web.stard.service;
 
+import com.web.stard.domain.board.study.application.StudyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class SchedulerTest {
