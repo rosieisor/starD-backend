@@ -13,7 +13,7 @@ import com.web.stard.domain.member.application.ProfileService;
 import com.web.stard.domain.member.domain.Interest;
 import com.web.stard.domain.member.domain.Member;
 import com.web.stard.domain.member.domain.Profile;
-import com.web.stard.dto.ProfileResponse;
+import com.web.stard.domain.member.dto.ProfileResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

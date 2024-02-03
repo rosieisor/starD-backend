@@ -3,7 +3,7 @@ package com.web.stard.domain.member.application;
 import com.web.stard.domain.member.domain.Member;
 import com.web.stard.domain.member.domain.Profile;
 import com.web.stard.domain.member.repository.ProfileRepository;
-import com.web.stard.dto.ProfileResponse;
+import com.web.stard.domain.member.dto.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;

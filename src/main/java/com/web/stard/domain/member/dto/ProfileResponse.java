@@ -1,4 +1,4 @@
-package com.web.stard.dto;
+package com.web.stard.domain.member.dto;
 
 import lombok.Builder;
 import lombok.Data;
