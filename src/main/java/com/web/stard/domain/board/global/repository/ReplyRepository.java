@@ -22,4 +22,6 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     List<Reply> findAllByStudyPostIdOrderByCreatedAtAsc(Long studyId);
 
     List<Reply> findAllByMember(Member member);
+
+    Page<Reply> findByMember(Member member, Pageable pageable);
 }

@@ -23,7 +23,7 @@ public class ReportDetail extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member member;  // 신고한 사람
 
     @Enumerated(EnumType.STRING)
     private ReportReason reason;

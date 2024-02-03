@@ -15,6 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -242,5 +246,17 @@ public class StudyPostService {
             // 파일 다운로드 중 오류가 발생할 경우 예외 처리
             throw new RuntimeException(e);
         }
+    }
+
+    /* 사용자가 작성한 모든 STUDYPOST 글 조회(마이페이지) */
+    public Page<StudyPost> findByMember(String memberId, int page) {
+        Member member = memberService.find(memberId);
+
+        Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page - 1, 10, sort);
+
+        Page<StudyPost> posts = studyPostRepository.findByMember(member, pageable);
+
+        return posts;
     }
 }

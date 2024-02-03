@@ -65,10 +65,9 @@ public class StudyService {
     }
 
     @Transactional
-    public Page<Study> findByRecruiter(Authentication authentication, int page) {
+    public Page<Study> findByRecruiter(String memberId, int page) {
 
-        String userId = authentication.getName();
-        Member member = memberService.find(userId);
+        Member member = memberService.find(memberId);
 
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page - 1, 9, sort);

@@ -3,6 +3,7 @@ package com.web.stard.domain.board.global.domain;
 import com.web.stard.domain.board.global.domain.enums.PostType;
 import com.web.stard.domain.board.study.domain.Study;
 import com.web.stard.domain.board.study.domain.StudyPost;
+import com.web.stard.domain.member.domain.Member;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,6 +18,10 @@ import javax.validation.constraints.NotNull;
 public class Report {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")  // 신고된 회원
+    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "post_id")

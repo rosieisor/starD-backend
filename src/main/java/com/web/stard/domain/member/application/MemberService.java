@@ -1,13 +1,13 @@
 package com.web.stard.domain.member.application;
 
+import com.web.stard.domain.board.global.domain.Report;
+import com.web.stard.domain.board.global.domain.ReportDetail;
+import com.web.stard.domain.board.global.repository.*;
 import com.web.stard.domain.chat_stomp.domain.ChatMessage;
 import com.web.stard.domain.chat_stomp.repository.ChatMessageRepository;
 import com.web.stard.global.config.jwt.JwtTokenProvider;
 import com.web.stard.domain.board.global.domain.Post;
 import com.web.stard.domain.board.global.domain.Reply;
-import com.web.stard.domain.board.global.repository.PostRepository;
-import com.web.stard.domain.board.global.repository.ReplyRepository;
-import com.web.stard.domain.board.global.repository.StarScrapRepository;
 import com.web.stard.domain.board.study.domain.Study;
 import com.web.stard.domain.board.study.domain.StudyMember;
 import com.web.stard.domain.board.study.domain.StudyPost;
@@ -62,6 +62,8 @@ public class MemberService {
     private final ReplyRepository replyRepository;
     private final StudyPostRepository studyPostRepository;
     private final StarScrapRepository starScrapRepository;
+    private final ReportRepository reportRepository;
+    private final ReportDetailRepository reportDetailRepository;
 
     private final RedisTemplate redisTemplate;
     private final JwtTokenProvider jwtTokenProvider;
@@ -165,9 +167,6 @@ public class MemberService {
         // 강제 탈퇴인지 확인
         if (userRole == Role.ADMIN && !id.equals(authentication.getName())) {
             forceDelete = true;
-            if (member.getReportCount() < 1) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("누적 신고 수가 10회 미만이면 강제 탈퇴 처리가 불가능합니다.");
-            }
         }
 
         // 강제 탈퇴 시 비밀번호 확인 및 스터디 진행 여부와 관계 없이 탈퇴 가능
@@ -181,6 +180,24 @@ public class MemberService {
             List<StudyMember> studies = studyMemberRepository.findByMemberAndStudyProgressStatusIn(member, statusList);
             if (studies.size() > 0) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("스터디 진행 중에는 탈퇴할 수 없습니다.");
+            }
+        }
+
+        if (member != null) {
+            // 탈퇴할 회원의 글과 댓글에 대한 Report 가져오기
+            List<Report> deleteReports = reportRepository.findByMember(member);
+
+            // deleteReports에 해당하는 reportDetail 삭제
+            if (deleteReports != null) {
+                for (Report report : deleteReports) {
+                    List<ReportDetail> reportDetails = reportDetailRepository.findByReportId(report.getId());
+                    if (!reportDetails.isEmpty()) {
+                        reportDetailRepository.deleteAll(reportDetails);
+                    }
+                }
+
+                // deleteReports 삭제
+                reportRepository.deleteAll(deleteReports);
             }
         }
 

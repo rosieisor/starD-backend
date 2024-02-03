@@ -1,16 +1,19 @@
 package com.web.stard.domain.member.api;
 
-import com.web.stard.domain.board.study.domain.Study;
-import com.web.stard.domain.board.study.domain.StudyMember;
-import com.web.stard.domain.member.domain.Interest;
-import com.web.stard.domain.board.study.domain.Applicant;
-import com.web.stard.domain.member.domain.Member;
-import com.web.stard.domain.member.domain.Profile;
-import com.web.stard.domain.board.study.domain.Evaluation;
+import com.web.stard.domain.board.community.application.CommunityService;
+import com.web.stard.domain.board.global.application.ReplyService;
+import com.web.stard.domain.board.global.domain.Post;
+import com.web.stard.domain.board.global.domain.Reply;
 import com.web.stard.domain.board.study.application.EvaluationService;
+import com.web.stard.domain.board.study.application.StudyPostService;
+import com.web.stard.domain.board.study.application.StudyService;
+import com.web.stard.domain.board.study.domain.*;
 import com.web.stard.domain.member.application.MemberService;
 import com.web.stard.domain.member.application.ProfileService;
-import com.web.stard.domain.board.study.application.StudyService;
+import com.web.stard.domain.member.domain.Interest;
+import com.web.stard.domain.member.domain.Member;
+import com.web.stard.domain.member.domain.Profile;
+import com.web.stard.dto.ProfileResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -38,8 +41,11 @@ public class MyPageController {
 
     private final ProfileService profileService;
     private final StudyService studyService;
+    private final CommunityService communityService;
 
     private final EvaluationService evaluationService;
+    private final ReplyService replyService;
+    private final StudyPostService studyPostService;
 
     /* 정보 반환 */
     @GetMapping("/update")
@@ -238,6 +244,26 @@ public class MyPageController {
         return profileService.getProfileImage(imageUrl);
     }
 
+    /* 다른 사용자 프로필 조회 */
+    @GetMapping("/profile/{memberId}")
+    public ProfileResponse getUserProfile(@PathVariable String memberId) {
+        return profileService.getUserProfile(memberId);
+    }
+
+    /* 다른 사용자 프로필 조회 - 스터디 모집 게시글 */
+    @GetMapping("/profile/{memberId}/open-study")
+    public Page<Study> findUserOpenHistory(@PathVariable String memberId,
+                                           @RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+        return studyService.findByRecruiter(memberId, page);
+    }
+
+    /* 다른 사용자 프로필 조회 - 커뮤니티 게시글 */
+    @GetMapping("/profile/{memberId}/community")
+    public Page<Post> findUserCommunityPost(@PathVariable String memberId,
+                                            @RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+        return communityService.findUserCommunityPost(memberId, page);
+    }
+
     // [U] 개인 신뢰도 수정
     @PutMapping("/credibility")
     public Profile updateCredibility(Authentication authentication) {
@@ -260,7 +286,7 @@ public class MyPageController {
     // [R] 스터디 개설 내역
     @GetMapping("/open-study")
     public Page<Study> findOpenHistory(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
-        return studyService.findByRecruiter(authentication, page);
+        return studyService.findByRecruiter(authentication.getName(), page);
     }
 
     // [R] 스터디 참여 내역
@@ -294,4 +320,23 @@ public class MyPageController {
     public Evaluation getMyEvaluation(@PathVariable Long evaluationId, Authentication authentication) {
         return evaluationService.getMyEvaluation(evaluationId, authentication);
     }
+
+    /* 내가 작성한 글 조회 */
+    @GetMapping("/post")
+    public Page<Post> findMyPost(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+        return communityService.findPostByMember(authentication.getName(), page);
+    }
+
+    /* 내가 작성한 STUDYPOST 글 조회 */
+    @GetMapping("/studypost")
+    public Page<StudyPost> findMyStudyPost(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+        return studyPostService.findByMember(authentication.getName(), page);
+    }
+
+    /* 내가 작성한 댓글 조회 */
+    @GetMapping("/reply")
+    public Page<Reply> findMyReply(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+        return replyService.findByMember(authentication.getName(), page);
+    }
+
 }
