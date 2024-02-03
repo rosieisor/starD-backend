@@ -4,6 +4,8 @@ import com.web.stard.domain.Member;
 import com.web.stard.domain.ProgressStatus;
 import com.web.stard.domain.Study;
 import com.web.stard.domain.StudyPost;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -22,4 +24,6 @@ public interface StudyPostRepository extends JpaRepository<StudyPost, Long> {
     List<StudyPost> findByStudyAndContentContainingOrderByCreatedAtDesc(Study study, String content);
     /* 닉네임 검색 */
     List<StudyPost> findByStudyAndMemberOrderByCreatedAtDesc(Study study, Member member);
+
+    Page<StudyPost> findByMember(Member member, Pageable pageable);
 }

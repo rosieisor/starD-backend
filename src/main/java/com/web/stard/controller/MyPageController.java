@@ -35,6 +35,7 @@ public class MyPageController {
 
     private final EvaluationService evaluationService;
     private final ReplyService replyService;
+    private final StudyPostService studyPostService;
 
     /* 정보 반환 */
     @GetMapping("/update")
@@ -314,6 +315,12 @@ public class MyPageController {
     @GetMapping("/post")
     public Page<Post> findMyPost(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
         return communityService.findPostByMember(authentication.getName(), page);
+    }
+
+    /* 내가 작성한 STUDYPOST 글 조회 */
+    @GetMapping("/studypost")
+    public Page<StudyPost> findMyStudyPost(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+        return studyPostService.findByMember(authentication.getName(), page);
     }
 
     /* 내가 작성한 댓글 조회 */
