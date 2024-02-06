@@ -36,7 +36,7 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
 
     Page<Study> findByRecruiterContainingAndRecruitStatus(String keyword, RecruitStatus recruitStatus, Pageable pageable);
 
-    @Query("SELECT new com.web.stard.dto.response.Top5Dto(s.field, COUNT(s.field)) FROM Study AS s GROUP BY s.field ORDER BY COUNT(s.field) DESC")
+    @Query("SELECT new com.web.stard.domain.board.study.dto(s.field, COUNT(s.field)) FROM Study AS s GROUP BY s.field ORDER BY COUNT(s.field) DESC")
     List<Top5Dto> findTop5();
 
     List<Study> findByRecruitmentDeadlineBefore(LocalDate localDate);
