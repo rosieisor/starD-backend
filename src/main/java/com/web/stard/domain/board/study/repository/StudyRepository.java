@@ -1,10 +1,10 @@
 package com.web.stard.domain.board.study.repository;
 
-import com.web.stard.domain.board.study.domain.enums.RecruitStatus;
 import com.web.stard.domain.board.study.domain.Study;
-import com.web.stard.domain.member.domain.Member;
 import com.web.stard.domain.board.study.domain.enums.ProgressStatus;
+import com.web.stard.domain.board.study.domain.enums.RecruitStatus;
 import com.web.stard.domain.board.study.dto.Top5Dto;
+import com.web.stard.domain.member.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,8 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface StudyRepository extends JpaRepository<Study, Long> {
-
-    Page<Study> findAll(Pageable pageable);
 
     Page<Study> findAllByOrderByRecruitStatus(Pageable pageable);
 
@@ -36,7 +34,7 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
 
     Page<Study> findByRecruiterContainingAndRecruitStatus(String keyword, RecruitStatus recruitStatus, Pageable pageable);
 
-    @Query("SELECT new com.web.stard.domain.board.study.dto(s.field, COUNT(s.field)) FROM Study AS s GROUP BY s.field ORDER BY COUNT(s.field) DESC")
+    @Query("SELECT new com.web.stard.domain.board.study.dto.Top5Dto(s.field, COUNT(s.field)) FROM Study AS s GROUP BY s.field ORDER BY COUNT(s.field) DESC")
     List<Top5Dto> findTop5();
 
     List<Study> findByRecruitmentDeadlineBefore(LocalDate localDate);
