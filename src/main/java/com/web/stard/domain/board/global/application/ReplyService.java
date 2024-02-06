@@ -8,15 +8,15 @@ import com.web.stard.domain.board.study.application.StudyPostService;
 import com.web.stard.domain.board.study.application.StudyService;
 import com.web.stard.domain.board.study.domain.Study;
 import com.web.stard.domain.board.study.domain.StudyPost;
+import com.web.stard.domain.board.study.repository.StudyRepository;
 import com.web.stard.domain.member.application.MemberService;
 import com.web.stard.domain.member.domain.Member;
 import com.web.stard.domain.member.domain.Role;
 import com.web.stard.domain.board.global.repository.PostRepository;
 import com.web.stard.domain.board.global.repository.ReplyRepository;
 import com.web.stard.domain.board.study.repository.StudyPostRepository;
-import com.web.stard.domain.board.study.repository.StudyRepository;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,18 +32,18 @@ import java.util.Optional;
 
 @Transactional
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter @Setter
 public class ReplyService {
 
-    MemberService memberService;
-    CommunityService communityService;
-    PostRepository postRepository;
-    ReplyRepository replyRepository;
-    StudyService studyService;
-    StudyRepository studyRepository;
-    StudyPostService studyPostService;
-    StudyPostRepository studyPostRepository;
+    private final MemberService memberService;
+    private final CommunityService communityService;
+    private final PostRepository postRepository;
+    private final ReplyRepository replyRepository;
+    private final StudyService studyService;
+    private final StudyRepository studyRepository;
+    private final StudyPostService studyPostService;
+    private final StudyPostRepository studyPostRepository;
 
     // 댓글이 존재하는지 확인
     private Reply getExistingReply(Long replyId) {

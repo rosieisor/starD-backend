@@ -1,11 +1,11 @@
 package com.web.stard.domain.board.study.application;
 
-
 import com.web.stard.domain.board.global.domain.enums.PostType;
 import com.web.stard.domain.board.study.domain.Applicant;
 import com.web.stard.domain.board.study.domain.enums.RecruitStatus;
 import com.web.stard.domain.board.study.domain.Study;
 import com.web.stard.domain.board.study.domain.StudyMember;
+import com.web.stard.domain.board.study.repository.StudyRepository;
 import com.web.stard.domain.member.domain.Member;
 import com.web.stard.domain.board.study.domain.enums.ProgressStatus;
 import com.web.stard.domain.board.study.dto.StudyDto;
@@ -13,8 +13,7 @@ import com.web.stard.domain.board.study.dto.Top5Dto;
 import com.web.stard.domain.member.application.MemberService;
 import com.web.stard.domain.board.study.repository.ApplicantRepository;
 import com.web.stard.domain.board.study.repository.StudyMemberRepository;
-import com.web.stard.domain.board.study.repository.StudyRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +28,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StudyService {
 
     private final StudyRepository studyRepository;
