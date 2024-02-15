@@ -169,8 +169,8 @@ public class ReplyService {
     }
 
     // study 게시글 아이디 별 댓글 조회 (생성일 순)
-    public List<Reply> findAllRepliesByStudyIdOrderByCreatedAtAsc(Long studyId) {
-        return replyRepository.findAllByStudyIdOrderByCreatedAtAsc(studyId);
+    public List<Reply> findAllByStudyIdAndStudyPostIdIsNullOrderByCreatedAtAsc(Long studyId) {
+        return replyRepository.findAllByStudyIdAndStudyPostIdIsNullOrderByCreatedAtAsc(studyId);
     }
 
     // studyPost 게시글 아이디 별 댓글 조회 (생성일 순)
@@ -187,6 +187,9 @@ public class ReplyService {
         if (postOptional.isPresent() && postOptional.get().getCategory() != null) {
             return postOptional.get().getType();
         }
+        if (postOptional.isPresent() && postOptional.get().getCategory() != null) {
+            return postOptional.get().getType();
+        }
 
         // Study 조회
         Optional<Study> studyOptional = studyRepository.findById(id);
@@ -199,12 +202,6 @@ public class ReplyService {
         if (studyPostOptional.isPresent() && studyPostOptional.get().getStudy() != null) {
             return studyPostOptional.get().getType();
         }
-
-        // Reply 조회
-/*        Optional<Reply> replyOptional = replyRepository.findById(id);
-        if (replyOptional.isPresent() && replyOptional.get().getContent() != null) {
-            return replyOptional.get().getType();
-        }*/
 
         return PostType.REPLY;
     }
