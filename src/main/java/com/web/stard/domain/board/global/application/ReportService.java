@@ -378,7 +378,7 @@ public class ReportService {
         }
         else if (report.getTableType() == PostType.STUDY) {
             Study study = report.getStudy();
-            List<Reply> replies = replyService.findAllRepliesByStudyIdOrderByCreatedAtAsc(study.getId());
+            List<Reply> replies = replyService.findAllByStudyIdAndStudyPostIdIsNullOrderByCreatedAtAsc(study.getId());
 
             if (replies != null) {
                 replyRepository.deleteAll(replies);

@@ -24,4 +24,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     List<Reply> findAllByMember(Member member);
 
     Page<Reply> findByMember(Member member, Pageable pageable);
+
+    /* study 게시글 아이디 별 댓글 전체 조회 (생성일 순) - studypost가 null인 것 */
+    List<Reply> findAllByStudyIdAndStudyPostIdIsNullOrderByCreatedAtAsc(Long studyId);
 }

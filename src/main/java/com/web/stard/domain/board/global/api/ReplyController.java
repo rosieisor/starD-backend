@@ -97,7 +97,7 @@ public class ReplyController {
     // study 게시글 아이디 별 댓글 조회 (생성일 순)
     @GetMapping("/study/{targetId}")
     public List<Reply> findAllRepliesByStudyId(@PathVariable Long targetId) {
-        return replyService.findAllRepliesByStudyIdOrderByCreatedAtAsc(targetId);
+        return replyService.findAllByStudyIdAndStudyPostIdIsNullOrderByCreatedAtAsc(targetId);
     }
 
     // studyPost 게시글 아이디 별 댓글 조회 (생성일 순)
