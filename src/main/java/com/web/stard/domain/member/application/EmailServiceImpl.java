@@ -42,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.username}")
     private String adminAccount;
 
-    @Value("${base.back-end.url}")
+    @Value("${base.front-end.url}")
     private String baseUrl;
 
     /*
