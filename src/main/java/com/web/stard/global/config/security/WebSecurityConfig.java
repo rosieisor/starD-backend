@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
             "/imageTest",
 
-            "/user/mypage/profile",
+            "/user/mypage/profile/**",
 
             // 전체 스터디 게시글 조회 허용 O
             "/api/v2/studies/all",
@@ -79,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/emails/verification-requests",
 
             "/find-password",
-            "/reset-password"
+            "/reset-password",
     };
 
     @Override
