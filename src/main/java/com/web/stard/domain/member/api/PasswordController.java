@@ -2,10 +2,13 @@ package com.web.stard.domain.member.api;
 
 import com.web.stard.domain.member.dto.EmailDto;
 import com.web.stard.domain.member.application.EmailService;
+import com.web.stard.domain.member.dto.PasswordUpdateDto;
 import com.web.stard.domain.member.dto.ResetPasswordResponse;
 import com.web.stard.domain.member.application.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -27,6 +30,12 @@ public class PasswordController {
     @GetMapping("/reset-password")
     public ResponseEntity<ResetPasswordResponse> verificationPassword(@RequestParam("token") String token) throws Exception {
         return ResponseEntity.ok().body(memberService.verificationPassword(token));
+    }
+
+    @PutMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody PasswordUpdateDto passwordUpdateDto, Authentication authentication) {
+        memberService.resetPassword(passwordUpdateDto, authentication);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 

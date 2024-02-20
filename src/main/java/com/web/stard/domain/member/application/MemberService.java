@@ -5,6 +5,7 @@ import com.web.stard.domain.board.global.domain.ReportDetail;
 import com.web.stard.domain.board.global.repository.*;
 import com.web.stard.domain.chat_stomp.domain.ChatMessage;
 import com.web.stard.domain.chat_stomp.repository.ChatMessageRepository;
+import com.web.stard.domain.member.dto.PasswordUpdateDto;
 import com.web.stard.global.config.jwt.JwtTokenProvider;
 import com.web.stard.domain.board.global.domain.Post;
 import com.web.stard.domain.board.global.domain.Reply;
@@ -316,5 +317,14 @@ public class MemberService {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
 
         return email;
+    }
+
+    public void resetPassword(PasswordUpdateDto passwordUpdateDto, Authentication authentication) {
+        Member member = find(authentication.getName());
+
+        if (passwordEncoder.matches(passwordUpdateDto.getNewPassword(), member.getPassword()))
+            throw new CustomException(ErrorCode.CONFLICT);
+
+        member.setPassword(passwordEncoder.encode(passwordUpdateDto.getNewPassword()));
     }
 }
