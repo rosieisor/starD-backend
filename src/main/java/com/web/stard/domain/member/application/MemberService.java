@@ -303,7 +303,8 @@ public class MemberService {
     public ResetPasswordResponse verificationPassword(String token) throws Exception {
         String email = validateResetPwToken(token);
 
-        String accessToken = jwtTokenProvider.createToken(email);
+        Member member = findByEmail(email);
+        String accessToken = jwtTokenProvider.createToken(member);
 
         return ResetPasswordResponse.builder()
                 .email(email)
