@@ -1,5 +1,6 @@
 package com.web.stard.global.config.jwt;
 
+import com.web.stard.domain.member.domain.Member;
 import com.web.stard.global.dto.TokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -71,13 +72,17 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    public String createToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createToken(Member member) {
+
+        String authorities = member.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
 
         Date now = new Date();
 
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(member.getId())
+                .claim(AUTHORITIES_KEY, authorities)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + RESET_PW_TOKEN_EXPIRE_TIME))
                 .signWith(SignatureAlgorithm.HS256, key)
