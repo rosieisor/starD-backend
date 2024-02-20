@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,10 +24,9 @@ public class PasswordController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<ResetPasswordResponse> resetPassword(HttpServletRequest request, @RequestParam("token") String token) throws Exception {
-
-        return ResponseEntity.ok().body(memberService.resetPassword(request, token));
+    @GetMapping("/reset-password")
+    public ResponseEntity<ResetPasswordResponse> verificationPassword(@RequestParam("token") String token) throws Exception {
+        return ResponseEntity.ok().body(memberService.verificationPassword(token));
     }
 
 
