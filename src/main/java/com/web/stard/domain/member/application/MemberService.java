@@ -23,6 +23,8 @@ import com.web.stard.domain.board.study.domain.enums.ProgressStatus;
 import com.web.stard.domain.member.repository.ProfileRepository;
 import com.web.stard.domain.member.dto.ResetPasswordResponse;
 import com.web.stard.domain.member.domain.Role;
+import com.web.stard.global.error.CustomException;
+import com.web.stard.global.error.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -35,8 +37,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class MemberService {
     @Transactional
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원"));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
     }
 
     public Member find(String id) {
@@ -299,16 +299,12 @@ public class MemberService {
         return memberRepository.findNicknameById(authentication.getName());
     }
 
-    public ResetPasswordResponse resetPassword(HttpServletRequest request, String token) throws Exception {
+    public ResetPasswordResponse verificationPassword(String token) throws Exception {
         String email = validateResetPwToken(token);
 
         String accessToken = jwtTokenProvider.createToken(email);
 
-        // TODO 로그 삭제
-        log.info("비밀번호 재설정 반환 uri: " + request.getRequestURI() + "?token=" + token);
-
         return ResetPasswordResponse.builder()
-                .uri(request.getRequestURI() + "?token=" + token)
                 .email(email)
                 .accessToken(accessToken).build();
     }
@@ -317,7 +313,7 @@ public class MemberService {
         String email = (String)redisTemplate.opsForValue().get(RESET_PW_PREFIX + token);
 
         if (email == null)
-            throw new Exception();
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
 
         return email;
     }

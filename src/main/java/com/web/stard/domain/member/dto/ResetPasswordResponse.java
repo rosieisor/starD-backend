@@ -9,15 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ResetPasswordResponse {
 
-    private String uri;
-
     private String email;
 
     private String accessToken;
 
     @Builder
-    public ResetPasswordResponse(String uri, String email, String accessToken) {
-        this.uri = uri;
+    public ResetPasswordResponse(String email, String accessToken) {
         this.email = email;
         this.accessToken = accessToken;
     }
