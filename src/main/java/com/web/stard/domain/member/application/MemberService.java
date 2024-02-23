@@ -320,6 +320,7 @@ public class MemberService {
         return email;
     }
 
+    @Transactional
     public void resetPassword(PasswordUpdateDto passwordUpdateDto, Authentication authentication) {
         Member member = find(authentication.getName());
 
