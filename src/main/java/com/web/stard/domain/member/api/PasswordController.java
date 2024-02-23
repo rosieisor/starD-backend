@@ -32,11 +32,5 @@ public class PasswordController {
         return ResponseEntity.ok().body(memberService.verificationPassword(token));
     }
 
-    @PutMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestBody PasswordUpdateDto passwordUpdateDto, Authentication authentication) {
-        memberService.resetPassword(passwordUpdateDto, authentication);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
 
 }

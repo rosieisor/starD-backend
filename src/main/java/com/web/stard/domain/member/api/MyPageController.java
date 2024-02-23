@@ -13,6 +13,7 @@ import com.web.stard.domain.member.application.ProfileService;
 import com.web.stard.domain.member.domain.Interest;
 import com.web.stard.domain.member.domain.Member;
 import com.web.stard.domain.member.domain.Profile;
+import com.web.stard.domain.member.dto.PasswordUpdateDto;
 import com.web.stard.domain.member.dto.ProfileResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -337,6 +338,12 @@ public class MyPageController {
     @GetMapping("/reply")
     public Page<Reply> findMyReply(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
         return replyService.findByMember(authentication.getName(), page);
+    }
+
+    @PutMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody PasswordUpdateDto passwordUpdateDto, Authentication authentication) {
+        memberService.resetPassword(passwordUpdateDto, authentication);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }
