@@ -13,6 +13,8 @@ import com.web.stard.domain.board.study.dto.Top5Dto;
 import com.web.stard.domain.member.application.MemberService;
 import com.web.stard.domain.board.study.repository.ApplicantRepository;
 import com.web.stard.domain.board.study.repository.StudyMemberRepository;
+import com.web.stard.domain.notification.domain.NotificationType;
+import com.web.stard.domain.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +38,7 @@ public class StudyService {
     private final ApplicantRepository applicantRepository;
     private final StudyMemberRepository studyMemberRepository;
 
+    private final NotificationService notificationService;
 
     public Study findById(Long id) {
         Optional<Study> result = studyRepository.findById(id);
@@ -299,6 +302,7 @@ public class StudyService {
 
         applicantRepository.save(applicant);
 
+        notificationService.send(study.getRecruiter(), NotificationType.STUDY, "해당 스터디에 지원", null);
         return null;
     }
 
@@ -400,8 +404,6 @@ public class StudyService {
             Study study = findById(id);
             String userId = authentication.getName();
             Member member = memberService.find(userId);
-            System.out.println(study.getRecruiter().getId());
-            System.out.println(userId);
 
             if (study.getRecruiter().getId().equals(userId)) {
                 createStudyMember(id, authentication);
@@ -425,6 +427,13 @@ public class StudyService {
 
                 study.setProgressStatus(ProgressStatus.valueOf("IN_PROGRESS"));
                 study.setRecruitStatus(RecruitStatus.valueOf("RECRUITMENT_COMPLETE"));
+
+                List<Member> finalStudyMembers = studyMemberRepository.findMembersByStudy(study);
+                String message = "\""+study.getTitle()+"\" 스터디가 매칭 되었습니다!";
+                finalStudyMembers.forEach(finalStudyMember -> {
+                    notificationService.send(finalStudyMember, NotificationType.STUDY_MATCHING, message, null);
+                });
+
             }
 
         } catch (Exception e) {
