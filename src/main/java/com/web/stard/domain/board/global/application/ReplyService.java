@@ -15,6 +15,8 @@ import com.web.stard.domain.member.domain.Role;
 import com.web.stard.domain.board.global.repository.PostRepository;
 import com.web.stard.domain.board.global.repository.ReplyRepository;
 import com.web.stard.domain.board.study.repository.StudyPostRepository;
+import com.web.stard.domain.notification.domain.NotificationType;
+import com.web.stard.domain.notification.service.NotificationService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -44,6 +46,7 @@ public class ReplyService {
     private final StudyRepository studyRepository;
     private final StudyPostService studyPostService;
     private final StudyPostRepository studyPostRepository;
+    private final NotificationService notificationService;
 
     // 댓글이 존재하는지 확인
     private Reply getExistingReply(Long replyId) {
@@ -82,7 +85,8 @@ public class ReplyService {
                 .content(replyContent)
                 .type(targetPost.getType())
                 .build();
-
+        String message = userId + "님이 \"" + targetPost.getTitle() + "\"에 답글을 남겼습니다.";
+        notificationService.send(targetPost.getMember(), NotificationType.POST, message, null);
         return replyRepository.save(reply);
     }
 
@@ -98,7 +102,8 @@ public class ReplyService {
                 .content(replyContent)
                 .type(PostType.STUDY)
                 .build();
-
+        String message = userId + "님이 \"" + targetStudy.getTitle() + "\"에 답글을 남겼습니다.";
+        notificationService.send(targetStudy.getRecruiter(), NotificationType.STUDY, message, null);
         return replyRepository.save(reply);
     }
 
@@ -116,7 +121,8 @@ public class ReplyService {
                 .content(replyContent)
                 .type(PostType.STUDYPOST)
                 .build();
-
+        String message = userId + "님이 \"" + targetStudy.getTitle() + "\"에 답글을 남겼습니다.";
+        notificationService.send(targetStudy.getRecruiter(), NotificationType.STUDY_POST, message, null);
         return replyRepository.save(reply);
     }
 
