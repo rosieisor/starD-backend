@@ -80,6 +80,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
             "/find-password",
             "/reset-password",
+
+            // 알림
+            "/notifications/**",
     };
 
     @Override
