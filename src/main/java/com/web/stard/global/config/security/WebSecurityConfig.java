@@ -74,7 +74,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/find-password",
             "/reset-password",
 
-//            "/notifications/subscribe/**"
+            // 알림
+            "/notifications/**"
     };
 
     @Override
