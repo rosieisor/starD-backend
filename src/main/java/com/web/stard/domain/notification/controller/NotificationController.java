@@ -49,4 +49,12 @@ public class NotificationController {
         notificationService.notify(userId, "data");
     }
 
+    @GetMapping(value = "/subscribe/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ApiOperation(value = "클라이언트에서 구독하기 위한 subscribe 메서드 / 로그인 시 사용")
+    @ApiImplicitParam(name = "lastEventId", value = "SSE 연결이 끊겼을 때, 클라이언트가 수신한 마지막 데이터의 id")
+    public SseEmitter subscribeByUserId(@PathVariable String userId,
+                                @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
+        return notificationService.subscribe(userId, lastEventId);
+    }
+
 }
