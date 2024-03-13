@@ -10,7 +10,7 @@ public class MemberRequestDto {
 
     @Getter
     @Setter
-    public static class Login {
+    public static class SignInDto {
 
         @NotEmpty(message = "이메일은 필수 입력값입니다.")
         private String memberId;
@@ -23,27 +23,4 @@ public class MemberRequestDto {
         }
     }
 
-    @Getter
-    @Setter
-    public static class Reissue {
-
-        @NotEmpty(message = "accessToken 을 입력해주세요.")
-        private String accessToken;
-
-        @NotEmpty(message = "refreshToken 을 입력해주세요.")
-        private String refreshToken;
-    }
-
-    @Getter
-    @Setter
-    public static class Logout {
-
-        @NotEmpty(message = "잘못된 요청입니다.")
-        private String accessToken;
-
-//        @NotEmpty(message = "잘못된 요청입니다.")
-        private String refreshToken;
-
-        private String memberId;
-    }
 }

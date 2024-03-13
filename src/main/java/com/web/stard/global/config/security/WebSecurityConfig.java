@@ -36,14 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //            "/v3/api-docs/**",
 //            "/swagger-ui/**"
 
-            "/api/v2/members/sign-up",
-            "/api/v2/members/login",
-            "/api/v2/members/authority",
-            "/api/v2/members/reissue",
-            "/api/v2/members/logout",
-            "/api/v2/members/check",
-            "/api/v2/members/check2",
-            "/api/v2/members/accessToken-expiration",
+            "/user/auth/**",
 
             "/api/v2/studies/**",    // TODO URL 수정
 
@@ -82,7 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/reset-password",
 
             // 알림
-            "/notifications/**",
+            "/notifications/**"
     };
 
     @Override
