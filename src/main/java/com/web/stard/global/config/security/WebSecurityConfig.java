@@ -4,18 +4,20 @@ import com.web.stard.global.config.jwt.JwtAuthenticationFilter;
 import com.web.stard.global.config.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+@Configuration
+public class WebSecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate redisTemplate;
@@ -33,8 +35,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
             /* swagger v3 */
-//            "/v3/api-docs/**",
-//            "/swagger-ui/**"
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
 
             "/user/auth/**",
 
@@ -78,8 +80,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/notifications/**"
     };
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .cors().and()
                 .httpBasic().disable()
@@ -101,10 +103,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .anyRequest().authenticated() //TODO 주석 제거
 
                 .and()
-                // JwtAuthenticationFilter를 UsernamePasswordAuthentictaionFilter 전에 적용시킨다.
+
+                // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 적용
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
 
-
+        return httpSecurity.build();
     }
 
     // 암호화에 필요한 PasswordEncoder Bean 등록
