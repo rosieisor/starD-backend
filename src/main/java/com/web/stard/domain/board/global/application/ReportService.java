@@ -21,6 +21,7 @@ import com.web.stard.domain.board.study.domain.Evaluation;
 import com.web.stard.domain.board.study.domain.enums.ProgressStatus;
 import com.web.stard.domain.member.repository.ProfileRepository;
 import com.web.stard.domain.member.domain.Role;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
+
 import java.util.*;
 
 @Transactional

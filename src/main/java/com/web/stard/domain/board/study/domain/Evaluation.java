@@ -1,11 +1,10 @@
 package com.web.stard.domain.board.study.domain;
 
-import com.sun.istack.NotNull;
 import com.web.stard.domain.member.domain.Member;
-import com.web.stard.domain.board.study.domain.Study;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table
@@ -17,7 +16,8 @@ public class Evaluation {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotNull @ManyToOne
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member; // 작성자 (평가한 회원)
 

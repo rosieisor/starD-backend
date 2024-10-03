@@ -1,10 +1,9 @@
 package com.web.stard.domain.chat_stomp.domain;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
+import jakarta.persistence.*;
 
 @Getter
 @Setter

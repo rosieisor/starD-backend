@@ -1,11 +1,11 @@
 package com.web.stard.domain.member.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -5,10 +5,10 @@ import com.web.stard.domain.board.study.domain.Study;
 import com.web.stard.domain.board.study.domain.StudyPost;
 import com.web.stard.domain.member.domain.Member;
 import com.web.stard.global.domain.BaseEntity;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
 
 @Entity
 @Table

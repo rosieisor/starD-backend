@@ -3,6 +3,7 @@ package com.web.stard.domain.admin.api;
 import com.web.stard.domain.board.global.domain.Post;
 import com.web.stard.domain.admin.application.FaqService;
 import com.web.stard.domain.member.application.MemberService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,8 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import javax.transaction.Transactional;
 
 @Transactional
 @Getter

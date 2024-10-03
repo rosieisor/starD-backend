@@ -1,6 +1,6 @@
 package com.web.stard.domain.board.study.dto;
 
-import com.sun.istack.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

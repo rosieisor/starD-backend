@@ -1,10 +1,10 @@
 package com.web.stard.domain.board.study.domain;
 
-import com.sun.istack.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,7 +16,8 @@ public class ToDo {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotNull @ManyToOne
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "study_id")
     private Study study;
 

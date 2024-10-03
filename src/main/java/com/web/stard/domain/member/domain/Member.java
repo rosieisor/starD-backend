@@ -1,13 +1,13 @@
 package com.web.stard.domain.member.domain;
 
-import com.sun.istack.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import jakarta.persistence.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -78,9 +78,7 @@ public class Member implements UserDetails {
     // 계정의 권한 목록 return
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(this.roles.getRoleValue()));
-        return authorities;
+        return List.of(new SimpleGrantedAuthority(roles.name()));
     }
 
     // 계정의 고유한 값 ex) PK return

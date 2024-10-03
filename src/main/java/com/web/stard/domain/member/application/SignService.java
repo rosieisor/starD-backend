@@ -8,6 +8,7 @@ import com.web.stard.global.dto.TokenInfo;
 import com.web.stard.domain.member.repository.MemberRepository;
 import com.web.stard.global.error.CustomException;
 import com.web.stard.global.error.ErrorCode;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j

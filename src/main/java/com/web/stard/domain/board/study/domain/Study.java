@@ -1,6 +1,7 @@
 package com.web.stard.domain.board.study.domain;
 
-import com.sun.istack.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import com.web.stard.domain.board.global.domain.enums.PostType;
 import com.web.stard.domain.board.study.domain.enums.ProgressStatus;
 import com.web.stard.domain.board.study.domain.enums.RecruitStatus;
@@ -10,7 +11,6 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity

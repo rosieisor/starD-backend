@@ -17,6 +17,7 @@ import com.web.stard.domain.board.global.repository.ReplyRepository;
 import com.web.stard.domain.board.study.repository.StudyPostRepository;
 import com.web.stard.domain.notification.domain.NotificationType;
 import com.web.stard.domain.notification.service.NotificationService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -28,7 +29,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,12 +1,13 @@
 package com.web.stard.domain.board.study.domain;
 
-import com.sun.istack.NotNull;
+
 import com.web.stard.domain.board.global.domain.enums.PostType;
 import com.web.stard.domain.member.domain.Member;
 import com.web.stard.global.domain.BaseEntity;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table
@@ -18,7 +19,8 @@ public class StudyPost extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotNull @ManyToOne
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "study_id")
     private Study study;
 

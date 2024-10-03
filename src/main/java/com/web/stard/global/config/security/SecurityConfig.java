@@ -1,15 +1,20 @@
 package com.web.stard.global.config.security;
 
+import com.web.stard.domain.member.application.CustomMemberDetailsService;
 import com.web.stard.global.config.jwt.JwtAuthenticationFilter;
 import com.web.stard.global.config.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -17,9 +22,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
-public class WebSecurityConfig {
+public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomMemberDetailsService customMemberDetailsService;
     private final RedisTemplate redisTemplate;
 
     private static final String[] PERMIT_URL_ARRAY = {
@@ -81,39 +87,26 @@ public class WebSecurityConfig {
     };
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .cors().and()
-                .httpBasic().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-
-                .authorizeRequests()
-                .antMatchers(PERMIT_URL_ARRAY).permitAll()
-//                .antMatchers("/api/v1/users/userTest").hasRole("USER")
-//                .antMatchers("/api/v1/users/adminTest").hasRole("ADMIN")
-                .anyRequest().authenticated()
-
-                // 해당 url 요청에 대해서는 로그인 요구 X
-//                .antMatchers("/", "/signup", "/checkDuplicateID", "/checkDuplicateNickname", "/login", "/current-member").permitAll() //TODO 주석 제거
-                // admin 요청에 대해서는 ROLE_ADMIN 역할을 가지고 있어야 함
-//                .antMatchers("/admin").hasRole("ADMIN")
-                // 나머지 요청에 대해서는 로그인 요구 O
-//                .anyRequest().authenticated() //TODO 주석 제거
-
-                .and()
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(PERMIT_URL_ARRAY).permitAll()
+                        .anyRequest().authenticated())
                 // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 적용
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
 
-        return httpSecurity.build();
+        return http.build();
     }
 
     // 암호화에 필요한 PasswordEncoder Bean 등록
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 
 }

@@ -2,11 +2,11 @@ package com.web.stard.domain.chat_stomp.application;
 
 import com.web.stard.domain.chat_stomp.domain.ChatRoom;
 import com.web.stard.domain.chat_stomp.repository.ChatRoomRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Service

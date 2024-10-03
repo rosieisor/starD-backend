@@ -24,6 +24,7 @@ import com.web.stard.domain.board.study.domain.enums.ProgressStatus;
 import com.web.stard.domain.member.repository.ProfileRepository;
 import com.web.stard.domain.member.dto.ResetPasswordResponse;
 import com.web.stard.domain.member.domain.Role;
+import com.web.stard.global.dto.TokenInfo;
 import com.web.stard.global.error.CustomException;
 import com.web.stard.global.error.ErrorCode;
 import lombok.Getter;
@@ -304,11 +305,11 @@ public class MemberService {
         String email = validateResetPwToken(token);
 
         Member member = findByEmail(email);
-        String accessToken = jwtTokenProvider.createToken(member);
+        TokenInfo tokenInfo = jwtTokenProvider.createToken(member);
 
         return ResetPasswordResponse.builder()
                 .email(email)
-                .accessToken(accessToken).build();
+                .accessToken(tokenInfo.getAccessToken()).build();
     }
 
     private String validateResetPwToken(String token) throws Exception {

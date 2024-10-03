@@ -1,10 +1,9 @@
 package com.web.stard.domain.member.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-
-import javax.validation.constraints.NotEmpty;
 
 public class MemberRequestDto {
 

@@ -1,11 +1,10 @@
 package com.web.stard.domain.notification.domain;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
 
 @Getter
 @Embeddable

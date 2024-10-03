@@ -4,10 +4,10 @@ import com.web.stard.domain.board.global.domain.enums.PostType;
 import com.web.stard.domain.board.study.domain.Study;
 import com.web.stard.domain.board.study.domain.StudyPost;
 import com.web.stard.domain.member.domain.Member;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
 
 @Entity
 @Table

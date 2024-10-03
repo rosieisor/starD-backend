@@ -1,13 +1,12 @@
 package com.web.stard.domain.board.study.domain;
 
-import com.web.stard.domain.board.study.domain.Study;
 import com.web.stard.domain.member.domain.Member;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
