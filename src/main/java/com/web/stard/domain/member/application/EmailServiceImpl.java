@@ -3,6 +3,7 @@ package com.web.stard.domain.member.application;
 import com.web.stard.domain.member.domain.Member;
 import com.web.stard.domain.member.dto.EmailDto;
 import com.web.stard.domain.member.repository.MemberRepository;
+import com.web.stard.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,9 +13,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import java.time.Duration;
 import java.util.Random;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
 
     private static final String RESET_PW_PREFIX = "ResetPwToken ";
 
-    private final RedisTemplate redisTemplate;
+    private final RedisUtil redisUtil;
 
     @Value("${spring.mail.auth-code-expiration-millis}")
     private long authCodeExpirationMillis;
@@ -106,7 +107,7 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(toEmail, authCode);
 
         // 이메일 인증 요청 시 인증 번호 Redis에 저장 ( key = "AuthCode " + Email / value = AuthCode )
-        redisTemplate.opsForValue().set(AUTH_CODE_PREFIX + toEmail, authCode, Duration.ofMillis(authCodeExpirationMillis));
+        redisUtil.setData(AUTH_CODE_PREFIX + toEmail, authCode, authCodeExpirationMillis);
 
     }
 
@@ -117,7 +118,7 @@ public class EmailServiceImpl implements EmailService {
      */
     @Override
     public boolean verifiedCode(String email, String authCode) throws Exception{
-        String redisAuthCode = (String) redisTemplate.opsForValue().get(AUTH_CODE_PREFIX + email);
+        String redisAuthCode = redisUtil.getData(AUTH_CODE_PREFIX + email);
 
         if (redisAuthCode == null)
             throw new Exception("시간 초과");
@@ -144,7 +145,7 @@ public class EmailServiceImpl implements EmailService {
 
         while(isExist){
 
-            String existEmail = (String) redisTemplate.opsForValue().get(RESET_PW_PREFIX + pwResetToken);
+            String existEmail = redisUtil.getData(RESET_PW_PREFIX + pwResetToken);
             if (existEmail == null)
                 break;
             else
@@ -171,7 +172,7 @@ public class EmailServiceImpl implements EmailService {
             // TODO 로그 삭제
             log.info("비밀번호 재설정 Url 생성: " + pwResetUrl);
             emailSender.send(message);
-            redisTemplate.opsForValue().set(RESET_PW_PREFIX + pwResetToken, emailDto.getEmail(), Duration.ofMillis(RESET_PW_TOKEN_EXPIRE_TIME));
+            redisUtil.setData(RESET_PW_PREFIX + pwResetToken, emailDto.getEmail(), RESET_PW_TOKEN_EXPIRE_TIME);
         } catch (MailException e) {
             e.printStackTrace();
             log.debug("MailService.sendEmail exception occur toEmail: {}", emailDto.getEmail());

@@ -2,7 +2,7 @@ package com.web.stard.domain.member.application;
 
 import com.web.stard.domain.member.dto.EmailDto;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 public interface EmailService {
 

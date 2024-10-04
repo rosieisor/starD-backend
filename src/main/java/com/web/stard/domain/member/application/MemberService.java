@@ -26,6 +26,7 @@ import com.web.stard.domain.member.dto.ResetPasswordResponse;
 import com.web.stard.domain.member.domain.Role;
 import com.web.stard.global.error.CustomException;
 import com.web.stard.global.error.ErrorCode;
+import com.web.stard.global.util.RedisUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -66,7 +67,7 @@ public class MemberService {
     private final ReportRepository reportRepository;
     private final ReportDetailRepository reportDetailRepository;
 
-    private final RedisTemplate redisTemplate;
+    private final RedisUtil redisUtil;
     private final JwtTokenProvider jwtTokenProvider;
     private static final String RESET_PW_PREFIX = "ResetPwToken ";
 
@@ -312,7 +313,7 @@ public class MemberService {
     }
 
     private String validateResetPwToken(String token) throws Exception {
-        String email = (String)redisTemplate.opsForValue().get(RESET_PW_PREFIX + token);
+        String email = redisUtil.getData(RESET_PW_PREFIX + token);
 
         if (email == null)
             throw new CustomException(ErrorCode.INVALID_TOKEN);

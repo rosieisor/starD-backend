@@ -8,6 +8,7 @@ import com.web.stard.global.dto.TokenInfo;
 import com.web.stard.domain.member.repository.MemberRepository;
 import com.web.stard.global.error.CustomException;
 import com.web.stard.global.error.ErrorCode;
+import com.web.stard.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -28,10 +29,9 @@ import java.util.concurrent.TimeUnit;
 public class SignService {
 
     private final MemberRepository memberRepository;
-    private final Response response;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final RedisTemplate redisTemplate;
+    private final RedisUtil redisUtil;
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_TYPE = "Bearer";
@@ -54,8 +54,8 @@ public class SignService {
             TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
 
             // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
-            redisTemplate.opsForValue()
-                    .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+            redisUtil
+                    .setData("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime());
             return tokenInfo;
 
         } catch (BadCredentialsException exception) {
@@ -70,7 +70,7 @@ public class SignService {
 
         // 2. 추출된 Access Token 에 담긴 Authentication 객체를 가져와 사용자의 id로 redis 에 저장된 Refresh Token 추출
         Authentication authentication = jwtTokenProvider.getAuthentication(expiredAccessToken);
-        String refreshToken = (String) redisTemplate.opsForValue().get("RT:" + authentication.getName());
+        String refreshToken = redisUtil.getData("RT:" + authentication.getName());
 
         // 3. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(refreshToken))
@@ -87,8 +87,7 @@ public class SignService {
         TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
 
         // 5. RefreshToken Redis 업데이트
-        redisTemplate.opsForValue()
-                .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+        redisUtil.setData("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime());
 
         return tokenInfo;
     }
@@ -105,12 +104,12 @@ public class SignService {
                 Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
 
                 // 3. Redis 에서 해당 User email 로 저장된 Refresh Token 존재 여부 확인 후 있을 경우 삭제
-                if (redisTemplate.opsForValue().get("RT:" + authentication.getName()) != null)
-                    redisTemplate.delete("RT:" + authentication.getName());
+                if (redisUtil.getData("RT:" + authentication.getName()) != null)
+                    redisUtil.deleteData("RT:" + authentication.getName());
 
                 // 4. 유효 시간이 만료되지 않는 경우, 해당 Access Token 유효시간 가지고 와서 BlackList 로 저장하기
                 Long expiration = jwtTokenProvider.getExpiration(accessToken);
-                redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+                redisUtil.setData(accessToken, "logout", expiration);
             } else {
                 // 만료된 access Token
                 throw new CustomException(ErrorCode.EXPIRED_TOKEN);
