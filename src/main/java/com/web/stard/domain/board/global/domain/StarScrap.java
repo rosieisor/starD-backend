@@ -1,6 +1,6 @@
 package com.web.stard.domain.board.global.domain;
 
-import com.sun.istack.NotNull;
+import jakarta.validation.constraints.NotNull;
 import com.web.stard.domain.board.global.domain.enums.ActType;
 import com.web.stard.domain.board.global.domain.enums.PostType;
 import com.web.stard.domain.board.study.domain.Study;
@@ -8,7 +8,7 @@ import com.web.stard.domain.board.study.domain.StudyPost;
 import com.web.stard.domain.member.domain.Member;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table
