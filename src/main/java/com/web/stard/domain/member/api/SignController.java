@@ -3,7 +3,7 @@ package com.web.stard.domain.member.api;
 import com.web.stard.domain.member.dto.MemberRequestDto;
 import com.web.stard.domain.member.application.SignService;
 import com.web.stard.global.dto.TokenInfo;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,19 +22,19 @@ public class SignController {
 
     private final SignService signService;
 
-    @ApiOperation(value = "로그인")
+    @Operation(description = "로그인")
     @PostMapping("/sign-in")
     public ResponseEntity<TokenInfo> signIn(@Valid @RequestBody MemberRequestDto.SignInDto dto) {
         return ResponseEntity.ok().body(signService.signIn(dto));
     }
 
-    @ApiOperation(value = "토큰 재발급")
+    @Operation(description = "토큰 재발급")
     @PostMapping("/reissue")
     public ResponseEntity<TokenInfo> reissue(HttpServletRequest request) {
         return ResponseEntity.ok().body(signService.reissue(request));
     }
 
-    @ApiOperation(value = "로그아웃")
+    @Operation(description = "로그아웃")
     @PostMapping("/sign-out")
     public void signOut(HttpServletRequest request) {
         signService.signOut(request);
