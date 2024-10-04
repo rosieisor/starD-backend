@@ -5,7 +5,7 @@ import com.web.stard.domain.member.domain.Member;
 import com.web.stard.global.domain.BaseEntity;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table
