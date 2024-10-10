@@ -32,14 +32,14 @@ public class FaqController {
 
     // faq 리스트 조회(페이지화o)
     @GetMapping
-    public Page<Post> getAllFaq(@RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+    public Page<Post> getAllFaq(@RequestParam(name = "page", defaultValue = "1", required = false) int page) {
         return faqService.getAllFaq(page);
     }
 
 
     // faq 상세 조회
     @GetMapping("/{id}")
-    public Post getFaqDetail(@PathVariable Long id) {
+    public Post getFaqDetail(@PathVariable(name = "id") Long id) {
         String userId = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -52,14 +52,14 @@ public class FaqController {
 
     // faq 수정
     @PostMapping("/{id}")
-    public Post updateFaq(@PathVariable Long id, @RequestBody Post requestPost, Authentication authentication) {
+    public Post updateFaq(@PathVariable(name = "id") Long id, @RequestBody Post requestPost, Authentication authentication) {
         Post post = faqService.updateFaq(id, requestPost, authentication);
         return post;
     }
 
     // faq 삭제
     @DeleteMapping("/{id}")
-    public void deleteFaq(@PathVariable Long id, Authentication authentication) {
+    public void deleteFaq(@PathVariable(name = "id") Long id, Authentication authentication) {
         faqService.deleteFaq(id, authentication);
     }
 }

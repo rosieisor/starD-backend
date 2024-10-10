@@ -32,14 +32,14 @@ public class QnaController {
 
     // qna 리스트 조회(페이지화o)
     @GetMapping
-    public Page<Post> getAllQna(@RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+    public Page<Post> getAllQna(@RequestParam(name = "page", defaultValue = "1", required = false) int page) {
         return qnaService.getAllQna(page);
     }
 
 
     // qna 상세 조회
     @GetMapping("/{id}")
-    public Post getQnaDetail(@PathVariable Long id ) {
+    public Post getQnaDetail(@PathVariable(name = "id") Long id ) {
         String userId = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -52,20 +52,20 @@ public class QnaController {
 
     // 수정
     @PostMapping("/{id}")
-    public Post updateQna(@PathVariable Long id, @RequestBody Post requestPost, Authentication authentication) {
+    public Post updateQna(@PathVariable(name = "id") Long id, @RequestBody Post requestPost, Authentication authentication) {
         Post post = qnaService.updateQna(id, requestPost, authentication);
         return post;
     }
 
     // qna 삭제
     @DeleteMapping("/{postId}")
-    public void deleteQna(@PathVariable Long postId, Authentication authentication) {
+    public void deleteQna(@PathVariable(name = "id") Long postId, Authentication authentication) {
         qnaService.deleteQna(postId, authentication);
     }
 
     // faq, qna 최신 순 전체 보기
     @GetMapping("/all")
-    public Page<Post> findAllFaqAndQna(@RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+    public Page<Post> findAllFaqAndQna(@RequestParam(name = "page", defaultValue = "1", required = false) int page) {
         return qnaService.getAllFaqsAndQnas(page);
     }
 
@@ -77,8 +77,8 @@ public class QnaController {
 
     // 전체 검색(페이지화o)
     @GetMapping("/search")
-    public Page<Post> searchQnaAndFaq(@RequestParam String searchType, @RequestParam String searchWord,
-                                      @RequestParam(value = "page", defaultValue = "1", required = false)  int page) {
+    public Page<Post> searchQnaAndFaq(@RequestParam(name = "searchType") String searchType, @RequestParam(name = "searchWord") String searchWord,
+                                      @RequestParam(name = "page", defaultValue = "1", required = false)  int page) {
         return qnaService.searchQnaAndFaq(searchType, searchWord, page);
     }
 
@@ -91,9 +91,9 @@ public class QnaController {
 
     // 카테고리 - 전체 검색(페이지화o)
     @GetMapping("/search/category")
-    public Page<Post> searchQnaOrFaqByCategory(@RequestParam String searchType, @RequestParam String category,
-                                               @RequestParam String searchWord,
-                                               @RequestParam(value = "page", defaultValue = "1", required = false)  int page) {
+    public Page<Post> searchQnaOrFaqByCategory(@RequestParam(name = "searchType") String searchType, @RequestParam(name = "category") String category,
+                                               @RequestParam(name = "searchWord") String searchWord,
+                                               @RequestParam(name = "page", defaultValue = "1", required = false)  int page) {
         return qnaService.searchQnaOrFaqByCategory(searchType, category, searchWord, page);
     }
 }

@@ -25,7 +25,7 @@ public class PasswordController {
     }
 
     @GetMapping("/reset-password")
-    public ResponseEntity<ResetPasswordResponse> verificationPassword(@RequestParam("token") String token) throws Exception {
+    public ResponseEntity<ResetPasswordResponse> verificationPassword(@RequestParam(name = "token") String token) throws Exception {
         return ResponseEntity.ok().body(memberService.verificationPassword(token));
     }
 

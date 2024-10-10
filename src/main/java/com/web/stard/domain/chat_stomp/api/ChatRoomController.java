@@ -29,15 +29,15 @@ public class ChatRoomController {
     }
 
     // 특정 채팅방 조회
-    @GetMapping("/room/{studyid}")
+    @GetMapping("/room/{studyId}")
     @ResponseBody
-    public ChatRoom getRoom(@PathVariable Long studyid) {
-        return chatService.findByStudyId(studyid);
+    public ChatRoom getRoom(@PathVariable(name = "studyId") Long studyId) {
+        return chatService.findByStudyId(studyId);
     }
 
     // 채팅 내역
     @GetMapping("/history/{studyId}")
-    public List<ChatMessage> getChatHistory(@PathVariable Long studyId) {
+    public List<ChatMessage> getChatHistory(@PathVariable(name = "studyId") Long studyId) {
         return chatMessageRepository.findByStudyId(studyId);
     }
 

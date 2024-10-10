@@ -46,7 +46,7 @@ public class NoticeController {
 
     // Notice 상세 조회
     @GetMapping("/{id}")
-    public Post getNoticeDetail(@PathVariable Long id) {
+    public Post getNoticeDetail(@PathVariable(name = "id") Long id) {
         String userId = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -59,20 +59,20 @@ public class NoticeController {
 
     // Notice 수정
     @PostMapping("/{id}")
-    public Post updateNotice(@PathVariable Long id, @RequestBody Post requestPost, Authentication authentication) {
+    public Post updateNotice(@PathVariable(name = "id") Long id, @RequestBody Post requestPost, Authentication authentication) {
         Post post = noticeService.updateNotice(id, requestPost, authentication);
         return post;
     }
 
     // Notice 삭제
     @DeleteMapping("/{id}")
-    public void deleteNotice(@PathVariable Long id, Authentication authentication) {
+    public void deleteNotice(@PathVariable(name = "id") Long id, Authentication authentication) {
         noticeService.deleteNotice(id, authentication);
     }
 
     // id로 타입 조회
     @GetMapping("/find-type/{id}")
-    public Optional<Post> findTypeById(@PathVariable Long id, Authentication authentication) {
+    public Optional<Post> findTypeById(@PathVariable(name = "id") Long id, Authentication authentication) {
         return noticeService.findTypeById(id, authentication);
     }
 
@@ -84,8 +84,8 @@ public class NoticeController {
 
     // 전체 검색(페이지화o)
     @GetMapping("/search")
-    public Page<Post> searchCommPost(@RequestParam String searchType, @RequestParam String searchWord,
-                                     @RequestParam(value = "page", defaultValue = "1", required = false)  int page) {
+    public Page<Post> searchCommPost(@RequestParam(name = "searchType") String searchType, @RequestParam(name = "searchWord") String searchWord,
+                                     @RequestParam(name = "page", defaultValue = "1", required = false)  int page) {
         return noticeService.searchNoticePost(searchType, searchWord, page);
     }
 }

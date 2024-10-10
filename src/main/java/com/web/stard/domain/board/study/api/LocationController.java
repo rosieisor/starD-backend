@@ -19,20 +19,20 @@ public class LocationController {
     private final LocationService locationService;
 
     @GetMapping("/{id}/all")
-    public Location getRecommendedPlaceAll(@PathVariable Long id, Authentication authentication) throws Exception {
+    public Location getRecommendedPlaceAll(@PathVariable(name = "id") Long id, Authentication authentication) throws Exception {
         // 스터디원 전체로 계산
         return locationService.getRecommendedPlaceAll(id);
     }
 
     @GetMapping("/{id}")
-    public Location getRecommendedPlace(@PathVariable Long id, @RequestParam String participantsStr,
+    public Location getRecommendedPlace(@PathVariable(name = "id") Long id, @RequestParam(name = "participantsStr") String participantsStr,
                                         Authentication authentication) throws Exception {
         // 해당 스터디(studyId)에서 모임에 참여하는 참여자들(participantsStr)로 중간 지점 구하기
         return locationService.getRecommendedPlace(id, participantsStr);
     }
 
     @GetMapping("/find")
-    public Location getFindMidpoint(@RequestParam List<String> placeList) throws Exception {
+    public Location getFindMidpoint(@RequestParam(name = "placeList") List<String> placeList) throws Exception {
         for (String s : placeList) {
             System.out.println("장소 : " + s);
         }
@@ -40,7 +40,7 @@ public class LocationController {
     }
 
     @GetMapping("/reverse/geocoder")
-    public String getAddress(@RequestParam Double latitude, @RequestParam Double longitude,
+    public String getAddress(@RequestParam(name = "latitude") Double latitude, @RequestParam(name = "longitude") Double longitude,
                              Authentication authentication) throws Exception {
         return locationService.reverseGeocoder(latitude, longitude);
     }

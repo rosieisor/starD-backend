@@ -65,50 +65,50 @@ public class ReplyController {
 
     // 댓글 수정 (Post, Study 공통)
     @PostMapping("/{commentId}")
-    public Reply updateReply(@PathVariable Long commentId, @RequestBody Map<String, String> requestMap, Authentication authentication) {
+    public Reply updateReply(@PathVariable(name = "commentId") Long commentId, @RequestBody Map<String, String> requestMap, Authentication authentication) {
         String replyContent = requestMap.get("replyContent");
         return replyService.updateReply(commentId, replyContent, authentication);
     }
 
     // 댓글 삭제 (Post, Study 공통)
     @DeleteMapping("/{commentId}")
-    public void deleteReply(@PathVariable Long commentId, Authentication authentication) {
+    public void deleteReply(@PathVariable(name = "commentId") Long commentId, Authentication authentication) {
         replyService.deleteReply(commentId, authentication);
     }
 
     // 댓글 조회
     @GetMapping("/{id}")
-    public Reply getReply(@PathVariable Long id){
+    public Reply getReply(@PathVariable(name = "id") Long id){
         return replyService.getReply(id);
     }
 
     // 댓글 전체 조회 (최신순, 페이징)
     @GetMapping()
-    public Page<Reply> findAllReplies(@RequestParam("page") int page) {
+    public Page<Reply> findAllReplies(@RequestParam(name = "page") int page) {
         return replyService.findAllReplies(page);
     }
 
     // post 게시글 아이디 별 댓글 조회 (생성일 순)
     @GetMapping("/post/{targetId}")
-    public List<Reply> findAllRepliesByPostId(@PathVariable Long targetId) {
+    public List<Reply> findAllRepliesByPostId(@PathVariable(name = "targetId") Long targetId) {
         return replyService.findAllRepliesByPostIdOrderByCreatedAtAsc(targetId);
     }
 
     // study 게시글 아이디 별 댓글 조회 (생성일 순)
     @GetMapping("/study/{targetId}")
-    public List<Reply> findAllRepliesByStudyId(@PathVariable Long targetId) {
+    public List<Reply> findAllRepliesByStudyId(@PathVariable(name = "targetId") Long targetId) {
         return replyService.findAllByStudyIdAndStudyPostIdIsNullOrderByCreatedAtAsc(targetId);
     }
 
     // studyPost 게시글 아이디 별 댓글 조회 (생성일 순)
     @GetMapping("/studypost/{targetId}")
-    public List<Reply> findAllRepliesByStudyPostId(@PathVariable Long targetId) {
+    public List<Reply> findAllRepliesByStudyPostId(@PathVariable(name = "targetId") Long targetId) {
         return replyService.findAllRepliesByStudyPostIdOrderByCreatedAtAsc(targetId);
     }
 
     // 댓글 작성하려는 게시글의 타입 조회
     @GetMapping("/type/{targetId}")
-    public PostType findPostTypeById(@PathVariable Long targetId) {
+    public PostType findPostTypeById(@PathVariable(name = "targetId") Long targetId) {
         return replyService.findPostTypeById(targetId);
     }
 

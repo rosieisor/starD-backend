@@ -83,7 +83,7 @@ public class MyPageController {
 
     /* 닉네임 중복 확인 */
     @PostMapping("/check/nickname")
-    public boolean checkNickname(@RequestParam("nickname") String nickname) {
+    public boolean checkNickname(@RequestParam(name = "nickname") String nickname) {
         // 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -101,7 +101,7 @@ public class MyPageController {
 
     /* 비밀번호 확인 (필요한 경우 사용) */
     @PostMapping("/check/password")
-    public boolean checkPassword(@RequestParam("password") String password) {
+    public boolean checkPassword(@RequestParam(name = "password") String password) {
         // 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -116,7 +116,7 @@ public class MyPageController {
 
     /* 닉네임 변경 */
     @PostMapping("/update/nickname")
-    public ResponseEntity<String> updateNickname(@RequestParam("nickname") String nickname) {
+    public ResponseEntity<String> updateNickname(@RequestParam(name = "nickname") String nickname) {
         // 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -131,7 +131,7 @@ public class MyPageController {
 
     /* 이메일 변경 */
     @PostMapping("/update/email")
-    public ResponseEntity<String> updateEmail(@RequestParam("email") String email) {
+    public ResponseEntity<String> updateEmail(@RequestParam(name = "email") String email) {
         // 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -146,7 +146,7 @@ public class MyPageController {
 
     /* 전화번호 변경 */
     @PostMapping("/update/phone")
-    public ResponseEntity<String> updatePhone(@RequestParam("phone") String phone) {
+    public ResponseEntity<String> updatePhone(@RequestParam(name = "phone") String phone) {
         // 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -161,8 +161,8 @@ public class MyPageController {
 
     /* 비밀번호 변경 */
     @PostMapping("/update/password")
-    public ResponseEntity<String> updatePassword(@RequestParam("password") String password,
-                                                 @RequestParam("newPassword") String newPassword) {
+    public ResponseEntity<String> updatePassword(@RequestParam(name = "password") String password,
+                                                 @RequestParam(name = "newPassword") String newPassword) {
         // 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -182,8 +182,8 @@ public class MyPageController {
 
     /* 거주지 변경 */
     @PostMapping("/update/address")
-    public ResponseEntity<String> updateAddress(@RequestParam("city") String city,
-                                                @RequestParam("district") String district) {
+    public ResponseEntity<String> updateAddress(@RequestParam(name = "city") String city,
+                                                @RequestParam(name = "district") String district) {
         // 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -198,7 +198,7 @@ public class MyPageController {
 
     /* 관심분야 변경 */
     @PostMapping("/update/interest")
-    public ResponseEntity<String> updateInterest(@RequestParam("interestList") String interests) {
+    public ResponseEntity<String> updateInterest(@RequestParam(name = "interestList") String interests) {
         System.out.println("관심분야 : " + interests);
 
         String[] interestArray = interests.split(",");
@@ -217,7 +217,7 @@ public class MyPageController {
 
     /* 회원 탈퇴 (아직 기능 X) */
     @PostMapping("/delete")
-    public ResponseEntity<String> delete(@RequestParam("password") String password, Authentication authentication) {
+    public ResponseEntity<String> delete(@RequestParam(name = "password") String password, Authentication authentication) {
         return memberService.deleteMember(authentication.getName(), password, authentication);
     }
 
@@ -241,27 +241,27 @@ public class MyPageController {
 
     // [R] 프로필 이미지 조회
     @GetMapping("/profile/image/{imageUrl}")
-    public ResponseEntity<Resource> getImage(@PathVariable String imageUrl) throws IOException {
+    public ResponseEntity<Resource> getImage(@PathVariable(name = "imageUrl") String imageUrl) throws IOException {
         return profileService.getProfileImage(imageUrl);
     }
 
     /* 다른 사용자 프로필 조회 */
     @GetMapping("/profile/{memberId}")
-    public ProfileResponse getUserProfile(@PathVariable String memberId) {
+    public ProfileResponse getUserProfile(@PathVariable(name = "memberId") String memberId) {
         return profileService.getUserProfile(memberId);
     }
 
     /* 다른 사용자 프로필 조회 - 스터디 모집 게시글 */
     @GetMapping("/profile/{memberId}/open-study")
-    public Page<Study> findUserOpenHistory(@PathVariable String memberId,
-                                           @RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+    public Page<Study> findUserOpenHistory(@PathVariable(name = "memberId") String memberId,
+                                           @RequestParam(name = "page", defaultValue = "1", required = false) int page) {
         return studyService.findByRecruiter(memberId, page);
     }
 
     /* 다른 사용자 프로필 조회 - 커뮤니티 게시글 */
     @GetMapping("/profile/{memberId}/community")
-    public Page<Post> findUserCommunityPost(@PathVariable String memberId,
-                                            @RequestParam(value = "page", defaultValue = "1", required = false) int page) {
+    public Page<Post> findUserCommunityPost(@PathVariable(name = "memberId") String memberId,
+                                            @RequestParam(name = "page", defaultValue = "1", required = false) int page) {
         return communityService.findUserCommunityPost(memberId, page);
     }
 
@@ -279,20 +279,20 @@ public class MyPageController {
 
     // [R] 스터디 신청 내역
     @GetMapping("/apply-study")
-    public Page<Applicant> findApplyHistory(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+    public Page<Applicant> findApplyHistory(@RequestParam(name = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
         System.out.println("스터디 신청 내역 함수 진입");
         return studyService.findByMember(authentication, page);
     }
 
     // [R] 스터디 개설 내역
     @GetMapping("/open-study")
-    public Page<Study> findOpenHistory(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+    public Page<Study> findOpenHistory(@RequestParam(name = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
         return studyService.findByRecruiter(authentication.getName(), page);
     }
 
     // [R] 스터디 참여 내역
     @GetMapping("/studying")
-    public Page<StudyMember> findStudyingHistory(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+    public Page<StudyMember> findStudyingHistory(@RequestParam(name = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
         System.out.println("스터디 참여 내역 컨트롤러 진입 O ");
         return studyService.findStudying(authentication, page);
     }
@@ -312,31 +312,31 @@ public class MyPageController {
 
     /* 평가 당한 내역 리스트 조회 (스터디 별로) */
     @GetMapping("/rate/target/study/{studyId}")
-    public List<Evaluation> getMyEvaluationListByStudy(@PathVariable Long studyId, Authentication authentication) {
+    public List<Evaluation> getMyEvaluationListByStudy(@PathVariable(name = "studyid") Long studyId, Authentication authentication) {
         return evaluationService.getMyEvaluationListByStudy(studyId, authentication);
     }
 
     /* 평가 당한 내역 상세 조회 */
     @GetMapping("/rate/target/{evaluationId}")
-    public Evaluation getMyEvaluation(@PathVariable Long evaluationId, Authentication authentication) {
+    public Evaluation getMyEvaluation(@PathVariable(name = "evaluationId") Long evaluationId, Authentication authentication) {
         return evaluationService.getMyEvaluation(evaluationId, authentication);
     }
 
     /* 내가 작성한 글 조회 */
     @GetMapping("/post")
-    public Page<Post> findMyPost(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+    public Page<Post> findMyPost(@RequestParam(name = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
         return communityService.findPostByMember(authentication.getName(), page);
     }
 
     /* 내가 작성한 STUDYPOST 글 조회 */
     @GetMapping("/studypost")
-    public Page<StudyPost> findMyStudyPost(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+    public Page<StudyPost> findMyStudyPost(@RequestParam(name = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
         return studyPostService.findByMember(authentication.getName(), page);
     }
 
     /* 내가 작성한 댓글 조회 */
     @GetMapping("/reply")
-    public Page<Reply> findMyReply(@RequestParam(value = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
+    public Page<Reply> findMyReply(@RequestParam(name = "page", defaultValue = "1", required = false) int page, Authentication authentication) {
         return replyService.findByMember(authentication.getName(), page);
     }
 

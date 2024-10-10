@@ -23,7 +23,7 @@ public class EmailController {
     }
 
     @GetMapping("/verifications")
-    public Boolean verificationEmail(@RequestParam("email") String email, @RequestParam("authCode") String authCode)  {
+    public Boolean verificationEmail(@RequestParam(name = "email") String email, @RequestParam(name = "authCode") String authCode)  {
         try {
             return emailService.verifiedCode(email, authCode);
         } catch (Exception e) {
