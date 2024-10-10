@@ -24,7 +24,7 @@ public class NotificationController {
     @Operation(description = "클라이언트에서 구독하기 위한 subscribe 메서드 / 로그인 시 사용")
 //    @ApiImplicitParam(name = "lastEventId", value = "SSE 연결이 끊겼을 때, 클라이언트가 수신한 마지막 데이터의 id")
     public SseEmitter subscribe(@RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId,
-                                @RequestParam(value = "token", required = false) String token) {
+                                @RequestParam(name = "token", required = false) String token) {
         Authentication authentication = jwtTokenProvider.getAuthentication(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String userId = authentication.getName();
@@ -34,14 +34,14 @@ public class NotificationController {
 
 //    @Description("서버에서 클라이언트로 알림을 주기 위한 메서드")
 //    @PostMapping("/send-data/{id}")
-//    public void sendData(@PathVariable String id) {
+//    public void sendData(@PathVariable(name = "id") String id) {
 //        notificationService.notify(id, "data");
 //    }
 
     // TODO emitter가 null이라는 NullPointerException 발생
     @Description("서버에서 클라이언트로 알림을 주기 위한 메서드")
     @PostMapping("/send-data")
-    public void sendData(@RequestParam(value = "token", required = false) String token) {
+    public void sendData(@RequestParam(name = "token", required = false) String token) {
         Authentication authentication = jwtTokenProvider.getAuthentication(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String userId = authentication.getName();
@@ -51,7 +51,7 @@ public class NotificationController {
     @GetMapping(value = "/subscribe/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(description = "클라이언트에서 구독하기 위한 subscribe 메서드 / 로그인 시 사용")
 //    @ApiImplicitParam(name = "lastEventId", value = "SSE 연결이 끊겼을 때, 클라이언트가 수신한 마지막 데이터의 id")
-    public SseEmitter subscribeByUserId(@PathVariable String userId,
+    public SseEmitter subscribeByUserId(@PathVariable(name = "userId") String userId,
                                 @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
         return notificationService.subscribe(userId, lastEventId);
     }

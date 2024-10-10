@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     @Bean
-    public OpenAPI umcAPI() {
+    public OpenAPI openAPI() {
         Info info = new Info().title("STARD API").description("STARD API 명세").version("0.0.1");
 
         String jwtSchemeName = "JWT TOKEN";

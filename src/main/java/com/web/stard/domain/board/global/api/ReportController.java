@@ -106,7 +106,7 @@ public class ReportController {
 
     // 특정 report의 신고 횟수 조회
     @GetMapping("/report-count/{reportId}")
-    public Long getReportCounts(@PathVariable Long reportId, Authentication authentication) {
+    public Long getReportCounts(@PathVariable(name = "reportId") Long reportId, Authentication authentication) {
         return reportService.getReportCountForReport(reportId);
     }
 
@@ -118,19 +118,19 @@ public class ReportController {
 
     // 특정 report의 신고 사유 조회
     @GetMapping("/reason/{reportId}")
-    public Map<String, Integer> getReportReasons(@PathVariable Long reportId, Authentication authentication) {
+    public Map<String, Integer> getReportReasons(@PathVariable(name = "reportId") Long reportId, Authentication authentication) {
         return reportService.getReportReasons(reportId, authentication);
     }
 
     // 신고 반려
     @DeleteMapping("/{reportId}")
-    public void rejectReport(@PathVariable Long reportId, Authentication authentication) {
+    public void rejectReport(@PathVariable(name = "reportId") Long reportId, Authentication authentication) {
         reportService.rejectReport(reportId, authentication);
     }
 
     // 신고 승인
     @PostMapping("/accept/{reportId}")
-    public void acceptReport(@PathVariable Long reportId, Authentication authentication) {
+    public void acceptReport(@PathVariable(name = "reportId") Long reportId, Authentication authentication) {
         reportService.acceptReport(reportId, authentication);
     }
 
@@ -142,7 +142,7 @@ public class ReportController {
 
     @PostMapping("/members/{memberId}")
     // 강제 탈퇴
-    public ResponseEntity<String> forceDeleteMember(@PathVariable String memberId, Authentication authentication) {
+    public ResponseEntity<String> forceDeleteMember(@PathVariable(name = "memberId") String memberId, Authentication authentication) {
 //        reportService.forceDeleteMember(memberId, authentication);
         return memberService.deleteMember(memberId, null, authentication);
     }

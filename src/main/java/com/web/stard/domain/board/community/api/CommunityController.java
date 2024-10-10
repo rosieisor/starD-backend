@@ -35,7 +35,7 @@ public class CommunityController {
 
     /* 커뮤니티 게시글 세부 조회 */
     @GetMapping("/{id}")
-    public Post getCommunityPost(@PathVariable Long id) {
+    public Post getCommunityPost(@PathVariable(name = "id") Long id) {
         String userId = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println(authentication.getName());
@@ -55,8 +55,8 @@ public class CommunityController {
 
     /* 전체 검색 (페이지화) */
     @GetMapping("/search")
-    public Page<Post> searchCommPost(@RequestParam String searchType, @RequestParam String searchWord,
-                                     @RequestParam(value = "page", defaultValue = "1", required = false)  int page) {
+    public Page<Post> searchCommPost(@RequestParam(name = "searchType") String searchType, @RequestParam(name = "searchWord") String searchWord,
+                                     @RequestParam(name = "page", defaultValue = "1", required = false)  int page) {
         return comService.searchCommPost(searchType, searchWord, page);
     }
 
@@ -69,8 +69,8 @@ public class CommunityController {
 
     /* 카테고리 - 전체 검색 (페이지화) */
     @GetMapping("/search/category")
-    public Page<Post> searchCommPostByCategory(@RequestParam String searchType, @RequestParam String category,
-                                               @RequestParam String searchWord, @RequestParam(value = "page", defaultValue = "1", required = false)  int page) {
+    public Page<Post> searchCommPostByCategory(@RequestParam(name = "searchType") String searchType, @RequestParam(name = "category") String category,
+                                               @RequestParam(name = "searchWord") String searchWord, @RequestParam(name = "page", defaultValue = "1", required = false)  int page) {
         return comService.searchCommPostByCategory(searchType, category, searchWord, page);
     }
 
@@ -83,14 +83,14 @@ public class CommunityController {
 
     /* 커뮤니티 게시글 수정 */
     @PostMapping("/{id}")
-    public Post updateCommPost(@PathVariable Long id, @RequestBody CommPostRequestDto requestPost, Authentication authentication) {
+    public Post updateCommPost(@PathVariable(name = "id") Long id, @RequestBody CommPostRequestDto requestPost, Authentication authentication) {
         Post post = comService.updateCommPost(id, requestPost, authentication);
         return post;
     }
 
     /* 커뮤니티 게시글 삭제 */
     @DeleteMapping("/{id}")
-    public boolean deleteCommPost(@PathVariable Long id, Authentication authentication) {
+    public boolean deleteCommPost(@PathVariable(name = "id") Long id, Authentication authentication) {
         return comService.deleteCommPost(id, authentication);
     }
 }

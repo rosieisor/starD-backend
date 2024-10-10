@@ -35,19 +35,19 @@ public class MemberController {
 
     // 중복 아이디 검증 - client
     @GetMapping("/checkDuplicateID")
-    public boolean checkDuplicateID(@RequestParam String id) {
+    public boolean checkDuplicateID(@RequestParam(name = "id") String id) {
         return signUpService.checkDuplicateMember(id);
     }
 
     // 중복 닉네임 검증 - client
     @GetMapping("/checkDuplicateNickname")
-    public boolean checkDuplicateNickname(@RequestParam String nickname) {
+    public boolean checkDuplicateNickname(@RequestParam(name = "nickname") String nickname) {
         return signUpService.checkNickname(nickname);
     }
 
     // [R] 아이디 찾기
     @GetMapping("/member/find-id")
-    private List<Member> findId(@RequestParam(value = "email") String email, @RequestParam(value = "phone") String phone) {
+    private List<Member> findId(@RequestParam(name = "email") String email, @RequestParam(name = "phone") String phone) {
         return memberService.findId(email, phone);
     }
 
